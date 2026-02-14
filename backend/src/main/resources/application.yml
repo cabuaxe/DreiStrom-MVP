@@ -33,6 +33,10 @@ spring:
     user: ${FLYWAY_USER:dreistrom_migration}
     password: ${FLYWAY_PASSWORD:dreistrom_dev}
 
+  mvc:
+    problemdetails:
+      enabled: true
+
   jackson:
     serialization:
       write-dates-as-timestamps: false
