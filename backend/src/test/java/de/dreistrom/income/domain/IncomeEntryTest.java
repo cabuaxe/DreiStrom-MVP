@@ -135,4 +135,62 @@ class IncomeEntryTest {
         assertThat(marchFreelance).hasSize(1);
         assertThat(marchFreelance.getFirst().getAmount()).isEqualByComparingTo("500.00");
     }
+
+    @Test
+    void sumCentsByStreamAndDateRange_returnsCorrectTotal() {
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.FREIBERUF,
+                new BigDecimal("1000.00"), LocalDate.of(2026, 3, 1)));
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.FREIBERUF,
+                new BigDecimal("2500.50"), LocalDate.of(2026, 6, 15)));
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.GEWERBE,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 3, 1)));
+        incomeEntryRepository.flush();
+
+        Long totalCents = incomeEntryRepository.sumCentsByStreamAndDateRange(
+                user.getId(), IncomeStream.FREIBERUF.name(),
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31));
+
+        // 1000.00 + 2500.50 = 3500.50 EUR = 350050 cents
+        assertThat(totalCents).isEqualTo(350050L);
+    }
+
+    @Test
+    void sumCentsByStreamAndDateRange_returnsNull_whenNoEntries() {
+        Long totalCents = incomeEntryRepository.sumCentsByStreamAndDateRange(
+                user.getId(), IncomeStream.EMPLOYMENT.name(),
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31));
+
+        assertThat(totalCents).isNull();
+    }
+
+    @Test
+    void sumCentsSelfEmployedByDateRange_sumsFreiberufAndGewerbe() {
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.FREIBERUF,
+                new BigDecimal("1000.00"), LocalDate.of(2026, 3, 1)));
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.GEWERBE,
+                new BigDecimal("2000.00"), LocalDate.of(2026, 5, 1)));
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.EMPLOYMENT,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 4, 1)));
+        incomeEntryRepository.flush();
+
+        Long totalCents = incomeEntryRepository.sumCentsSelfEmployedByDateRange(
+                user.getId(),
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31));
+
+        // FREIBERUF 1000 + GEWERBE 2000 = 3000 EUR = 300000 cents (excludes EMPLOYMENT)
+        assertThat(totalCents).isEqualTo(300000L);
+    }
+
+    @Test
+    void sumCentsSelfEmployedByDateRange_returnsNull_whenNoSelfEmployed() {
+        incomeEntryRepository.save(new IncomeEntry(user, IncomeStream.EMPLOYMENT,
+                new BigDecimal("5000.00"), LocalDate.of(2026, 1, 31)));
+        incomeEntryRepository.flush();
+
+        Long totalCents = incomeEntryRepository.sumCentsSelfEmployedByDateRange(
+                user.getId(),
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31));
+
+        assertThat(totalCents).isNull();
+    }
 }
