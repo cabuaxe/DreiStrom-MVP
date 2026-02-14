@@ -15,5 +15,10 @@ GRANT UPDATE, DELETE ON dreistrom.document      TO 'dreistrom_app'@'%';
 GRANT UPDATE, DELETE ON dreistrom.client        TO 'dreistrom_app'@'%';
 GRANT UPDATE, DELETE ON dreistrom.income_entry  TO 'dreistrom_app'@'%';
 
+-- Expense tables (V3)
+GRANT UPDATE, DELETE ON dreistrom.allocation_rule     TO 'dreistrom_app'@'%';
+GRANT UPDATE, DELETE ON dreistrom.expense_entry       TO 'dreistrom_app'@'%';
+GRANT UPDATE, DELETE ON dreistrom.depreciation_asset  TO 'dreistrom_app'@'%';
+
 -- event_log: intentionally NO UPDATE/DELETE (GoBD compliance)
 -- dreistrom_app only has SELECT + INSERT via database-level grant
