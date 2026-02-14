@@ -22,7 +22,7 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration,classpath:db/callback
     user: ${FLYWAY_USER:dreistrom_migration}
     password: ${FLYWAY_PASSWORD:dreistrom_dev}
 
