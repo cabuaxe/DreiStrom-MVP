@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.12.0",
+    "generators": {
+      "dreistrom-api": {
+        "generatorName": "typescript-angular",
+        "inputSpec": "../backend/target/openapi.json",
+        "output": "src/app/api/generated",
+        "additionalProperties": {
+          "ngVersion": "21.0.0",
+          "supportsES6": true,
+          "withInterfaces": true,
+          "providedIn": "root",
+          "stringEnums": true,
+          "enumPropertyNaming": "UPPERCASE",
+          "fileNaming": "kebab-case",
+          "modelFileSuffix": ".model",
+          "serviceFileSuffix": ".service",
+          "serviceSuffix": "ApiService"
+        },
+        "skipValidateSpec": true
+      }
+    }
+  }
+}
