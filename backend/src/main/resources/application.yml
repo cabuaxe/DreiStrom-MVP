@@ -6,7 +6,7 @@ spring:
     name: dreistrom
 
   datasource:
-    url: jdbc:mysql://localhost:3306/dreistrom?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin
+    url: jdbc:mysql://localhost:${DB_PORT:3307}/dreistrom?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin
     username: ${DB_USERNAME:dreistrom_app}
     password: ${DB_PASSWORD:dreistrom_dev}
 
