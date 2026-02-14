@@ -2,6 +2,7 @@ package de.dreistrom.common.controller;
 
 import de.dreistrom.common.domain.AppUser;
 import de.dreistrom.common.repository.AppUserRepository;
+import de.dreistrom.config.RateLimitFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,12 @@ class AuthControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
     @BeforeEach
     void setUp() {
+        rateLimitFilter.clearBuckets();
         appUserRepository.deleteAll();
         appUserRepository.save(new AppUser(
                 "owner@dreistrom.de",

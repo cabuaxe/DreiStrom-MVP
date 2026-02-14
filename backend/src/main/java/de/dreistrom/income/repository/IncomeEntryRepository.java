@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface IncomeEntryRepository extends JpaRepository<IncomeEntry, Long> {
 
+    List<IncomeEntry> findByUserId(Long userId);
+
     List<IncomeEntry> findByUserIdAndStreamType(Long userId, IncomeStream streamType);
 
     List<IncomeEntry> findByUserIdAndEntryDateBetween(Long userId, LocalDate from, LocalDate to);
