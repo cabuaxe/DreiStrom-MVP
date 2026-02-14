@@ -77,4 +77,17 @@ public class IncomeEntry {
         this.client = client;
         this.description = description;
     }
+
+    /**
+     * Soft-update: apply mutable fields. Stream type is immutable after creation.
+     */
+    public void update(BigDecimal amount, LocalDate entryDate, String source,
+                       Client client, String description) {
+        this.amount = amount;
+        this.entryDate = entryDate;
+        this.source = source;
+        this.client = client;
+        this.description = description;
+        this.updatedAt = Instant.now();
+    }
 }
