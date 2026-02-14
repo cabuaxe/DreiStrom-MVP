@@ -1,0 +1,55 @@
+@if (loading() && !status()) {
+  <mat-card>
+    <mat-card-content class="loading-state">
+      <mat-icon>hourglass_empty</mat-icon>
+      <span>Lade Abfärbung-Status…</span>
+    </mat-card-content>
+  </mat-card>
+} @else if (status(); as s) {
+  <mat-card [class.warning]="s.thresholdExceeded" [class.safe]="!s.thresholdExceeded">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="card-icon" [class.warning-icon]="s.thresholdExceeded">
+        {{ s.thresholdExceeded ? 'warning' : 'check_circle' }}
+      </mat-icon>
+      <mat-card-title>Abfärbung Monitor</mat-card-title>
+      <mat-card-subtitle>Steuerjahr {{ s.year }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="ratio-display">
+        <span class="ratio-value" [class.exceeded]="s.thresholdExceeded">
+          {{ ratioPercent() | number:'1.1-2':'de-DE' }}%
+        </span>
+        <span class="threshold-label">Schwelle: 3,0%</span>
+      </div>
+
+      <mat-progress-bar
+        mode="determinate"
+        [value]="progressValue()"
+        [color]="progressColor()">
+      </mat-progress-bar>
+
+      <div class="revenue-details">
+        <div class="revenue-item">
+          <span class="label">Gewerbe-Einnahmen</span>
+          <span class="amount">{{ s.gewerbeRevenue | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="revenue-item">
+          <span class="label">Selbständig gesamt</span>
+          <span class="amount">{{ s.selfEmployedRevenue | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+      </div>
+
+      <div class="conditions">
+        <div class="condition" [class.met]="ratioPercent() > 3">
+          <mat-icon class="condition-icon">{{ ratioPercent() > 3 ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+          <span>Verhältnis &gt; 3%</span>
+        </div>
+        <div class="condition" [class.met]="s.gewerbeRevenue > 24500">
+          <mat-icon class="condition-icon">{{ s.gewerbeRevenue > 24500 ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+          <span>Gewerbe &gt; 24.500 €</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
