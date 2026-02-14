@@ -1,5 +1,7 @@
 package de.dreistrom.common.controller;
 
+import de.dreistrom.config.RateLimitFilter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +21,14 @@ class GlobalExceptionHandlerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
+    @BeforeEach
+    void setUp() {
+        rateLimitFilter.clearBuckets();
+    }
 
     @Test
     void validationError_returnsProblemDetail() throws Exception {

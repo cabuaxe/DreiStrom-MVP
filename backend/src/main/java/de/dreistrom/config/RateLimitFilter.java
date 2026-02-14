@@ -44,6 +44,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return !path.startsWith("/api/auth/login");
     }
 
+    /** Visible for testing — clears all rate-limit buckets. */
+    public void clearBuckets() {
+        buckets.clear();
+    }
+
     private Bucket createBucket(String key) {
         return Bucket.builder()
                 .addLimit(Bandwidth.builder()

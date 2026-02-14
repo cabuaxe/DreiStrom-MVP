@@ -67,4 +67,41 @@ public class IncomeService {
     public List<IncomeEntry> listByStream(Long userId, IncomeStream streamType) {
         return incomeEntryRepository.findByUserIdAndStreamType(userId, streamType);
     }
+
+    @Transactional(readOnly = true)
+    public List<IncomeEntry> listAll(Long userId) {
+        return incomeEntryRepository.findByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncomeEntry> listByDateRange(Long userId, LocalDate from, LocalDate to) {
+        return incomeEntryRepository.findByUserIdAndEntryDateBetween(userId, from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncomeEntry> listByStreamAndDateRange(Long userId, IncomeStream streamType,
+                                                       LocalDate from, LocalDate to) {
+        return incomeEntryRepository.findByUserIdAndStreamTypeAndEntryDateBetween(
+                userId, streamType, from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public IncomeEntry getById(Long entryId, Long userId) {
+        IncomeEntry entry = incomeEntryRepository.findById(entryId)
+                .orElseThrow(() -> new EntityNotFoundException("IncomeEntry", entryId));
+        if (!entry.getUser().getId().equals(userId)) {
+            throw new EntityNotFoundException("IncomeEntry", entryId);
+        }
+        return entry;
+    }
+
+    @Transactional
+    public void delete(Long entryId, Long userId) {
+        IncomeEntry entry = incomeEntryRepository.findById(entryId)
+                .orElseThrow(() -> new EntityNotFoundException("IncomeEntry", entryId));
+        if (!entry.getUser().getId().equals(userId)) {
+            throw new EntityNotFoundException("IncomeEntry", entryId);
+        }
+        incomeEntryRepository.delete(entry);
+    }
 }
