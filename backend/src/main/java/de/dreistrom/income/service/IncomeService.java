@@ -1,0 +1,70 @@
+package de.dreistrom.income.service;
+
+import de.dreistrom.audit.service.AuditLogService;
+import de.dreistrom.common.controller.EntityNotFoundException;
+import de.dreistrom.common.domain.AppUser;
+import de.dreistrom.common.domain.IncomeStream;
+import de.dreistrom.income.domain.Client;
+import de.dreistrom.income.domain.IncomeEntry;
+import de.dreistrom.income.event.IncomeEntryCreated;
+import de.dreistrom.income.event.IncomeEntryModified;
+import de.dreistrom.income.repository.IncomeEntryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class IncomeService {
+
+    private final IncomeEntryRepository incomeEntryRepository;
+    private final AuditLogService auditLogService;
+
+    @Transactional
+    public IncomeEntry create(AppUser user, IncomeStream streamType, BigDecimal amount,
+                              LocalDate entryDate, String source, Client client,
+                              String description) {
+        IncomeEntry entry = new IncomeEntry(user, streamType, amount, entryDate,
+                source, client, description);
+        IncomeEntry saved = incomeEntryRepository.save(entry);
+
+        auditLogService.persist(new IncomeEntryCreated(saved));
+
+        return saved;
+    }
+
+    @Transactional
+    public IncomeEntry update(Long entryId, IncomeStream streamType, BigDecimal amount,
+                              LocalDate entryDate, String source, Client client,
+                              String description) {
+        IncomeEntry entry = incomeEntryRepository.findById(entryId)
+                .orElseThrow(() -> new EntityNotFoundException("IncomeEntry", entryId));
+
+        if (streamType != entry.getStreamType()) {
+            throw new IllegalArgumentException(
+                    "Cross-stream update not allowed: cannot change stream from "
+                    + entry.getStreamType() + " to " + streamType);
+        }
+
+        BigDecimal beforeAmount = entry.getAmount();
+        LocalDate beforeDate = entry.getEntryDate();
+        String beforeSource = entry.getSource();
+
+        entry.update(amount, entryDate, source, client, description);
+
+        auditLogService.persist(new IncomeEntryModified(
+                entryId, beforeAmount, amount, beforeDate, entryDate,
+                beforeSource, source));
+
+        return entry;
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncomeEntry> listByStream(Long userId, IncomeStream streamType) {
+        return incomeEntryRepository.findByUserIdAndStreamType(userId, streamType);
+    }
+}
