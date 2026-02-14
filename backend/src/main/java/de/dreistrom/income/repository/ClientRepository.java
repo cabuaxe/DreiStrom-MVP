@@ -11,4 +11,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findByUserIdAndActiveTrue(Long userId);
 
     List<Client> findByUserIdAndStreamType(Long userId, IncomeStream streamType);
+
+    List<Client> findByUserIdAndStreamTypeAndActiveTrue(Long userId, IncomeStream streamType);
+
+    List<Client> findByUserId(Long userId);
 }

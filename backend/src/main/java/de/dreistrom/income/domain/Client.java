@@ -65,4 +65,23 @@ public class Client {
         this.country = country;
         this.ustIdNr = ustIdNr;
     }
+
+    /**
+     * Soft-update: apply mutable fields. Stream type is immutable after creation.
+     */
+    public void update(String name, ClientType clientType, String country,
+                       String ustIdNr, Boolean active) {
+        this.name = name;
+        if (clientType != null) {
+            this.clientType = clientType;
+        }
+        if (country != null) {
+            this.country = country;
+        }
+        this.ustIdNr = ustIdNr;
+        if (active != null) {
+            this.active = active;
+        }
+        this.updatedAt = Instant.now();
+    }
 }
