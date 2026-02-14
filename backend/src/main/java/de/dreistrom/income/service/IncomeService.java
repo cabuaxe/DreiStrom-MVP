@@ -10,6 +10,7 @@ import de.dreistrom.income.event.IncomeEntryCreated;
 import de.dreistrom.income.event.IncomeEntryModified;
 import de.dreistrom.income.repository.IncomeEntryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class IncomeService {
 
     private final IncomeEntryRepository incomeEntryRepository;
     private final AuditLogService auditLogService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public IncomeEntry create(AppUser user, IncomeStream streamType, BigDecimal amount,
@@ -32,7 +34,9 @@ public class IncomeService {
                 source, client, description);
         IncomeEntry saved = incomeEntryRepository.save(entry);
 
-        auditLogService.persist(new IncomeEntryCreated(saved));
+        IncomeEntryCreated event = new IncomeEntryCreated(saved);
+        auditLogService.persist(event);
+        eventPublisher.publishEvent(event);
 
         return saved;
     }
@@ -56,9 +60,11 @@ public class IncomeService {
 
         entry.update(amount, entryDate, source, client, description);
 
-        auditLogService.persist(new IncomeEntryModified(
+        IncomeEntryModified modifiedEvent = new IncomeEntryModified(
                 entryId, beforeAmount, amount, beforeDate, entryDate,
-                beforeSource, source));
+                beforeSource, source);
+        auditLogService.persist(modifiedEvent);
+        eventPublisher.publishEvent(modifiedEvent);
 
         return entry;
     }
