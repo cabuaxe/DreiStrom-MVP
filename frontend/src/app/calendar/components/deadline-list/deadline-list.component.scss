@@ -1,0 +1,147 @@
+:host {
+  display: block;
+}
+
+.card-icon {
+  color: var(--mat-sys-primary);
+}
+
+.loading-text {
+  padding: 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin-top: 8px;
+  }
+}
+
+.deadline-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deadline-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid transparent;
+  background: var(--mat-sys-surface-container-lowest);
+
+  &.overdue {
+    border-left-color: #c62828;
+    background: #fff5f5;
+  }
+
+  &.urgent {
+    border-left-color: #e65100;
+    background: #fff8e1;
+  }
+
+  &.soon {
+    border-left-color: #f9a825;
+  }
+
+  &.normal {
+    border-left-color: var(--mat-sys-primary);
+  }
+}
+
+.deadline-icon {
+  .status-overdue {
+    color: #c62828;
+  }
+
+  .status-due {
+    color: #e65100;
+  }
+
+  .status-upcoming {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.deadline-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.deadline-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.deadline-type {
+  mat-chip-set {
+    display: inline;
+  }
+
+  .type-chip {
+    font-size: 0.7rem;
+    min-height: 20px;
+    padding: 0 8px;
+  }
+}
+
+.deadline-date {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.deadline-countdown {
+  text-align: right;
+  white-space: nowrap;
+
+  .countdown-value {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  &.overdue .countdown-value {
+    color: #c62828;
+  }
+
+  &.urgent .countdown-value {
+    color: #e65100;
+  }
+
+  &.soon .countdown-value {
+    color: #f9a825;
+  }
+
+  &.normal .countdown-value {
+    color: var(--mat-sys-primary);
+  }
+}
+
+@media (max-width: 599px) {
+  .deadline-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .deadline-countdown {
+    width: 100%;
+    text-align: left;
+    padding-left: 36px;
+  }
+}

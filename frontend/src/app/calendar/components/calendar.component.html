@@ -1,0 +1,64 @@
+<h2>Kalender</h2>
+
+<div class="calendar-toolbar">
+  <div class="nav-controls">
+    <button mat-icon-button (click)="onPrevMonth()">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span class="month-label">{{ currentMonthLabel() }}</span>
+    <button mat-icon-button (click)="onNextMonth()">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <button mat-stroked-button (click)="onToday()">Heute</button>
+  </div>
+
+  <div class="toolbar-actions">
+    <mat-button-toggle-group [value]="viewMode()" (change)="onViewChange($event.value)">
+      <mat-button-toggle value="month">
+        <mat-icon>calendar_view_month</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="list">
+        <mat-icon>view_list</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #actionsMenu="matMenu">
+      <button mat-menu-item (click)="onGenerateEvents()">
+        <mat-icon>auto_fix_high</mat-icon>
+        <span>Termine generieren ({{ currentYear() }})</span>
+      </button>
+      <button mat-menu-item (click)="onDownloadICal()">
+        <mat-icon>download</mat-icon>
+        <span>iCal exportieren</span>
+      </button>
+    </mat-menu>
+  </div>
+</div>
+
+<div class="calendar-layout">
+  <div class="calendar-main">
+    @if (viewMode() === 'month') {
+      <app-month-view
+        [currentDate]="currentDate()"
+        [events]="events()"
+        (eventClicked)="onEventClicked($event)" />
+    } @else {
+      <app-deadline-list
+        [events]="events()"
+        [loading]="loading()"
+        (completeClicked)="onCompleteEvent($event)" />
+    }
+  </div>
+
+  <div class="calendar-sidebar">
+    <app-deadline-list
+      [events]="events()"
+      [loading]="loading()"
+      (completeClicked)="onCompleteEvent($event)" />
+
+    <app-reminder-panel />
+  </div>
+</div>

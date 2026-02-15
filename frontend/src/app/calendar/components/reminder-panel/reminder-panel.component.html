@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">tune</mat-icon>
+    <mat-card-title>Erinnerungen</mat-card-title>
+    <mat-card-subtitle>Benachrichtigungseinstellungen</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="section">
+      <h4 class="section-title">Kanäle</h4>
+      @for (channel of channels(); track channel.label; let i = $index) {
+        <div class="setting-row">
+          <mat-icon class="setting-icon">{{ channel.icon }}</mat-icon>
+          <span class="setting-label">{{ channel.label }}</span>
+          <mat-slide-toggle
+            [checked]="channel.enabled"
+            (change)="toggleChannel(i)" />
+        </div>
+      }
+    </div>
+
+    <mat-divider />
+
+    <div class="section">
+      <h4 class="section-title">Erinnerungsintervalle</h4>
+      @for (interval of intervals(); track interval.days; let i = $index) {
+        <div class="setting-row">
+          <mat-checkbox
+            [checked]="interval.enabled"
+            (change)="toggleInterval(i)">
+            {{ interval.label }}
+          </mat-checkbox>
+        </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
