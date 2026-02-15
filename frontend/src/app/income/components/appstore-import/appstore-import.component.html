@@ -1,0 +1,145 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">storefront</mat-icon>
+    <mat-card-title>App Store Import</mat-card-title>
+    <mat-card-subtitle>CSV-Import für Umsatzberichte (Gewerbe)</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Platform selector -->
+    <div class="platform-selector">
+      <mat-button-toggle-group [value]="platform()" (change)="onPlatformChange($event.value)">
+        <mat-button-toggle value="APPLE">
+          <mat-icon>apple</mat-icon> Apple
+        </mat-button-toggle>
+        <mat-button-toggle value="GOOGLE">
+          <mat-icon>android</mat-icon> Google Play
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- Fee program toggle -->
+    <div class="fee-toggle">
+      <mat-checkbox [checked]="reducedFee()" (change)="reducedFee.set($event.checked)">
+        @if (platform() === 'APPLE') {
+          Small Business Program (15% statt 30%)
+        } @else {
+          Reduced Fee Program (15% statt 30%)
+        }
+      </mat-checkbox>
+    </div>
+
+    <!-- File upload -->
+    @if (!importComplete()) {
+      <div class="upload-section">
+        <button mat-stroked-button (click)="fileInput.click()">
+          <mat-icon>upload_file</mat-icon>
+          CSV-Datei auswählen
+        </button>
+        <input #fileInput type="file" accept=".csv,.tsv,.txt" hidden (change)="onFileSelect($event)" />
+
+        @if (selectedFile(); as file) {
+          <span class="file-info">{{ file.name }} ({{ (file.size / 1024).toFixed(1) }} KB)</span>
+          <button mat-flat-button color="primary"
+                  [disabled]="importing()"
+                  (click)="onImport()">
+            <mat-icon>cloud_upload</mat-icon>
+            Importieren
+          </button>
+        }
+      </div>
+
+      @if (importing()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+
+      @if (error()) {
+        <p class="error-text">{{ error() }}</p>
+      }
+    }
+
+    <!-- Import results / preview -->
+    @if (importComplete() && preview().length > 0) {
+      <div class="import-success">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ preview().length }} Einträge erfolgreich importiert</span>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Brutto</span>
+          <span class="summary-value">{{ totalGross | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Provision</span>
+          <span class="summary-value commission">-{{ totalCommission | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Netto (Auszahlung)</span>
+          <span class="summary-value net">{{ totalNet | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Stück</span>
+          <span class="summary-value">{{ totalQuantity | number:'1.0-0':'de-DE' }}</span>
+        </div>
+      </div>
+
+      <!-- Entries table -->
+      <table mat-table [dataSource]="preview()" class="payout-table">
+        <ng-container matColumnDef="product">
+          <th mat-header-cell *matHeaderCellDef>Produkt</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="product-name">{{ entry.productName }}</span>
+            <span class="product-id">{{ entry.productId }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="region">
+          <th mat-header-cell *matHeaderCellDef>Region</th>
+          <td mat-cell *matCellDef="let entry">
+            <mat-chip-set>
+              <mat-chip>{{ entry.region }}</mat-chip>
+            </mat-chip-set>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef class="right">Stück</th>
+          <td mat-cell *matCellDef="let entry" class="right">{{ entry.quantity }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gross">
+          <th mat-header-cell *matHeaderCellDef class="right">Brutto</th>
+          <td mat-cell *matCellDef="let entry" class="right">
+            {{ entry.grossRevenue | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="commission">
+          <th mat-header-cell *matHeaderCellDef class="right">Provision</th>
+          <td mat-cell *matCellDef="let entry" class="right commission">
+            -{{ entry.commission | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="net">
+          <th mat-header-cell *matHeaderCellDef class="right">Netto</th>
+          <td mat-cell *matCellDef="let entry" class="right net">
+            {{ entry.netRevenue | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div class="reset-action">
+        <button mat-stroked-button (click)="onReset()">
+          <mat-icon>restart_alt</mat-icon>
+          Neuer Import
+        </button>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

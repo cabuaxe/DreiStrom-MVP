@@ -140,3 +140,10 @@
     </div>
   }
 </div>
+
+<!-- App Store import section (shown on Gewerbe tab) -->
+@if (selectedStreamType() === 'GEWERBE') {
+  <div class="appstore-section">
+    <app-appstore-import />
+  </div>
+}
