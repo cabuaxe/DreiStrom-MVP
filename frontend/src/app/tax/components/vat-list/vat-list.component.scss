@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.year-select {
+  width: 120px;
+}
+
+.vat-table {
+  width: 100%;
+}
+
+.right {
+  text-align: right;
+}
+
+.amount {
+  font-weight: 500;
+
+  &.negative {
+    color: #2ea043;
+  }
+}
+
+.loading-text,
+.empty-text {
+  padding: 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+mat-chip {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 599px) {
+  .vat-table {
+    font-size: 0.85rem;
+  }
+}
