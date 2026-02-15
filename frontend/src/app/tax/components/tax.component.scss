@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.tax-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tax-grid-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tax-grid-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vat-section {
+  margin-top: 8px;
+}
+
+@media (max-width: 959px) {
+  .tax-grid {
+    grid-template-columns: 1fr;
+  }
+}
