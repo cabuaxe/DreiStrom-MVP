@@ -170,6 +170,16 @@ public class InvoiceService {
         return invoiceRepository.findByUserIdAndStatus(userId, status);
     }
 
+    @Transactional(readOnly = true)
+    public List<Invoice> listByDateRange(Long userId, LocalDate from, LocalDate to) {
+        return invoiceRepository.findByUserIdAndInvoiceDateBetween(userId, from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Invoice> listByClient(Long userId, Long clientId) {
+        return invoiceRepository.findByUserIdAndClientId(userId, clientId);
+    }
+
     /**
      * Delete an invoice. Only DRAFT invoices can be deleted.
      */
