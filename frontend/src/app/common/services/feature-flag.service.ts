@@ -73,7 +73,7 @@ export class FeatureFlagService {
   private subscribeToUpdates(): void {
     this.sseSub?.unsubscribe();
     this.sseSub = this.sseService
-      .connect<UserFeatureFlags>('/api/v1/dashboard/events', 'feature-flags')
+      .on<UserFeatureFlags>('feature-flags')
       .subscribe({
         next: (event) => this.flags.set(event.data),
       });

@@ -1,12 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { LOCALE_ID } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { LOCALE_ID, signal } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import { of, EMPTY } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardService } from '../services/dashboard.service';
 import { SseService } from '../../common/services/sse.service';
+import { FeatureFlagService } from '../../common/services/feature-flag.service';
 
 registerLocaleData(localeDe);
 
@@ -16,6 +19,8 @@ describe('DashboardComponent', () => {
       imports: [DashboardComponent],
       providers: [
         provideAnimationsAsync(),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         {
           provide: DashboardService,
           useValue: {
@@ -26,11 +31,25 @@ describe('DashboardComponent', () => {
               thresholdExceeded: false,
               year: 2026,
             })),
+            getKleinunternehmerStatus: vi.fn().mockReturnValue(EMPTY),
+            getSocialInsuranceStatus: vi.fn().mockReturnValue(EMPTY),
+            getGewerbesteuerThreshold: vi.fn().mockReturnValue(EMPTY),
+            getMandatoryFilingStatus: vi.fn().mockReturnValue(EMPTY),
+            getArbZGStatus: vi.fn().mockReturnValue(EMPTY),
           },
         },
         {
           provide: SseService,
-          useValue: { connect: vi.fn().mockReturnValue(EMPTY) },
+          useValue: { on: vi.fn().mockReturnValue(EMPTY), connect: vi.fn().mockReturnValue(EMPTY) },
+        },
+        {
+          provide: FeatureFlagService,
+          useValue: {
+            flags: signal(null),
+            loaded: signal(true),
+            initialize: vi.fn(),
+            destroy: vi.fn(),
+          },
         },
         { provide: LOCALE_ID, useValue: 'de-DE' },
       ],

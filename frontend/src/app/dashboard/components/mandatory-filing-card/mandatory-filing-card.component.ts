@@ -35,7 +35,7 @@ export class MandatoryFilingCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<MandatoryFilingStatus>('/api/v1/dashboard/events', 'mandatory-filing')
+    this.sseSub = this.sseService.on<MandatoryFilingStatus>('mandatory-filing')
       .subscribe({
         next: (event) => this.status.set(event.data),
       });

@@ -1,12 +1,12 @@
 package de.dreistrom.income.listener;
 
+import de.dreistrom.common.sse.UnifiedSseEmitterService;
 import de.dreistrom.income.event.ThresholdAlert;
 import de.dreistrom.income.event.ThresholdType;
 import de.dreistrom.income.service.ArbZGService;
 import de.dreistrom.income.service.DashboardService;
 import de.dreistrom.income.service.FeatureFlagService;
 import de.dreistrom.income.service.GewerbesteuerThresholdService;
-import de.dreistrom.income.service.IncomeSseEmitterService;
 import de.dreistrom.income.service.MandatoryFilingService;
 import de.dreistrom.vat.service.KleinunternehmerStatusService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SseThresholdListener {
 
-    private final IncomeSseEmitterService sseEmitterService;
+    private final UnifiedSseEmitterService sseEmitterService;
     private final DashboardService dashboardService;
     private final KleinunternehmerStatusService kleinunternehmerStatusService;
     private final GewerbesteuerThresholdService gewerbesteuerThresholdService;

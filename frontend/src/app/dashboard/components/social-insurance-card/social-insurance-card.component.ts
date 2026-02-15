@@ -84,7 +84,7 @@ export class SocialInsuranceCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<SocialInsuranceStatus>('/api/v1/dashboard/events', 'social-insurance')
+    this.sseSub = this.sseService.on<SocialInsuranceStatus>('social-insurance')
       .subscribe({
         next: (event) => this.status.set(event.data),
       });

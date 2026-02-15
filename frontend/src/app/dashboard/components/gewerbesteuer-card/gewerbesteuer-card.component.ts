@@ -46,7 +46,7 @@ export class GewerbesteuerCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<GewerbesteuerThreshold>('/api/v1/dashboard/events', 'gewerbesteuer')
+    this.sseSub = this.sseService.on<GewerbesteuerThreshold>('gewerbesteuer')
         .subscribe({
           next: (event) => this.status.set(event.data),
         });
