@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Service
-public class SseEmitterService {
+public class IncomeSseEmitterService {
 
     private final Map<Long, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 

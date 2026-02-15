@@ -4,7 +4,7 @@ import de.dreistrom.income.dto.AbfaerbungStatusResponse;
 import de.dreistrom.income.event.ThresholdAlert;
 import de.dreistrom.income.event.ThresholdType;
 import de.dreistrom.income.service.DashboardService;
-import de.dreistrom.income.service.SseEmitterService;
+import de.dreistrom.income.service.IncomeSseEmitterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SseThresholdListener {
 
-    private final SseEmitterService sseEmitterService;
+    private final IncomeSseEmitterService sseEmitterService;
     private final DashboardService dashboardService;
 
     @EventListener
