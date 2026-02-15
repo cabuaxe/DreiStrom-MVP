@@ -79,6 +79,14 @@ public class IncomeEntry {
     }
 
     /**
+     * Link this income entry to the invoice that generated it.
+     */
+    public void linkInvoice(Long invoiceId) {
+        this.invoiceId = invoiceId;
+        this.updatedAt = Instant.now();
+    }
+
+    /**
      * Soft-update: apply mutable fields. Stream type is immutable after creation.
      */
     public void update(BigDecimal amount, LocalDate entryDate, String source,
