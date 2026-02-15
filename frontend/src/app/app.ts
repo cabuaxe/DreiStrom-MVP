@@ -43,6 +43,7 @@ export class App {
 
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
+    { label: 'Onboarding', route: '/onboarding', icon: 'rocket_launch' },
     { label: 'Einnahmen', route: '/income', icon: 'trending_up' },
     { label: 'Ausgaben', route: '/expenses', icon: 'trending_down' },
     { label: 'Rechnungen', route: '/invoicing', icon: 'receipt_long' },

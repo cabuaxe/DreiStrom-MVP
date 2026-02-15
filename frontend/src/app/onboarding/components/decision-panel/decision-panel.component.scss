@@ -1,0 +1,162 @@
+.decision-panel {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 500;
+
+  .question-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.decision-made {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.option-card {
+  position: relative;
+
+  &.recommended {
+    outline: 2px solid var(--mat-sys-primary);
+  }
+
+  .recommendation-chip {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    font-size: 0.75rem;
+  }
+
+  mat-card-content p {
+    font-size: 0.9rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  mat-divider {
+    margin: 12px 0;
+  }
+
+  mat-card-actions {
+    padding: 8px 16px 16px;
+  }
+}
+
+.pros, .cons {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    line-height: 1.4;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+}
+
+.pro-icon {
+  color: var(--mat-sys-primary);
+}
+
+.con-icon {
+  color: var(--mat-sys-error);
+}
+
+.evaluation-summary {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container);
+
+  h5 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+  }
+
+  .eval-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    span {
+      font-size: 0.85rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+}
+
+.evaluate-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+
+  .evaluate-hint {
+    font-size: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.recommendation-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container);
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+}
