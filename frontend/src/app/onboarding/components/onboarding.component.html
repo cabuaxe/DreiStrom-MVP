@@ -1,0 +1,116 @@
+<div class="onboarding-header">
+  <h2>Onboarding-Checkliste</h2>
+  <p class="subtitle">15 Schritte zur vollständigen Geschäftseinrichtung</p>
+</div>
+
+@if (loading() && !progress()) {
+  <p class="loading-hint">Lade Checkliste…</p>
+} @else if (progress(); as prog) {
+  <div class="progress-summary">
+    <div class="progress-text">
+      <span class="progress-count">{{ completedCount() }} von {{ totalCount() }} abgeschlossen</span>
+      <span class="progress-percent">{{ progressPercent() }} %</span>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progressPercent()"
+      class="main-progress"
+    />
+  </div>
+
+  <mat-accordion multi class="steps-accordion">
+    @for (step of prog.steps; track step.id) {
+      <mat-expansion-panel
+        [expanded]="expandedStep() === step.stepNumber"
+        [disabled]="step.status === 'BLOCKED' && !areDependenciesMet(step)"
+        (opened)="onStepOpened(step.stepNumber)"
+        (closed)="onStepClosed(step.stepNumber)"
+        class="step-panel"
+        [class.completed]="step.status === 'COMPLETED'"
+        [class.in-progress]="step.status === 'IN_PROGRESS'"
+        [class.blocked]="step.status === 'BLOCKED' || (step.status === 'NOT_STARTED' && !areDependenciesMet(step))"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title class="step-title">
+            <mat-icon [class]="'status-icon status-' + step.status">
+              {{ statusIcon(step.status) }}
+            </mat-icon>
+            <span class="step-number">{{ step.stepNumber }}.</span>
+            <span>{{ step.title }}</span>
+          </mat-panel-title>
+          <mat-panel-description class="step-meta">
+            <mat-chip class="responsible-chip">
+              <mat-icon matChipAvatar>{{ responsibleIcon(step.responsible) }}</mat-icon>
+              {{ responsibleLabel(step.responsible) }}
+            </mat-chip>
+            <span class="status-label" [class]="'status-' + step.status">
+              {{ statusLabel(step.status) }}
+            </span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="step-content">
+          <p class="step-description">{{ step.description }}</p>
+
+          @if (!areDependenciesMet(step)) {
+            <div class="blocking-info">
+              <mat-icon>info</mat-icon>
+              <div>
+                <strong>Voraussetzungen nicht erfüllt:</strong>
+                <ul>
+                  @for (title of getBlockingStepTitles(step); track title) {
+                    <li>{{ title }}</li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
+
+          @if (hasDecisionPoint(step)) {
+            <app-decision-panel
+              [decisionPoint]="step.decisionPoints[0]"
+              (decided)="onDecision(step, $event)"
+            />
+          }
+
+          @if (isDocumentStep(step.stepNumber)) {
+            <div class="document-action">
+              <button mat-stroked-button (click)="generateDocument(documentLabel(step.stepNumber))">
+                <mat-icon>description</mat-icon>
+                {{ documentLabel(step.stepNumber) }} generieren
+              </button>
+            </div>
+          }
+
+          <div class="step-actions">
+            @if (canStart(step)) {
+              <button
+                mat-flat-button
+                (click)="startStep(step)"
+                [disabled]="actionLoading() === step.stepNumber"
+              >
+                Starten
+              </button>
+            }
+            @if (canComplete(step)) {
+              <button
+                mat-flat-button
+                (click)="completeStep(step)"
+                [disabled]="actionLoading() === step.stepNumber"
+              >
+                <mat-icon>check</mat-icon>
+                Abschließen
+              </button>
+            }
+            @if (step.status === 'COMPLETED' && step.completedAt) {
+              <span class="completed-date">
+                <mat-icon>event_available</mat-icon>
+                Abgeschlossen
+              </span>
+            }
+          </div>
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+}
