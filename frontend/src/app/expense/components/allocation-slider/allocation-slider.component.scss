@@ -1,0 +1,66 @@
+.allocation-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+
+  mat-slider {
+    width: 100%;
+  }
+}
+
+.slider-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.freiberuf { color: #2EA043; }
+  &.gewerbe { color: #CC092F; }
+  &.personal { color: #3884F4; }
+}
+
+.slider-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sum-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-top: 4px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.valid {
+    color: #2EA043;
+  }
+
+  &.invalid {
+    color: #CC092F;
+  }
+}

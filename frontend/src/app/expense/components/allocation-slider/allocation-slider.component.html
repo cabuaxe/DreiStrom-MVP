@@ -1,0 +1,40 @@
+<div class="allocation-slider">
+  <div class="slider-row">
+    <span class="slider-label freiberuf">
+      <mat-icon>edit_note</mat-icon> Freiberuf
+    </span>
+    <mat-slider min="0" max="100" step="1" discrete>
+      <input matSliderThumb [value]="freiberufPct()" (valueChange)="onFreiberufChange($event)">
+    </mat-slider>
+    <span class="slider-value">{{ freiberufPct() }}%</span>
+  </div>
+
+  <div class="slider-row">
+    <span class="slider-label gewerbe">
+      <mat-icon>store</mat-icon> Gewerbe
+    </span>
+    <mat-slider min="0" max="100" step="1" discrete>
+      <input matSliderThumb [value]="gewerbePct()" (valueChange)="onGewerbeChange($event)">
+    </mat-slider>
+    <span class="slider-value">{{ gewerbePct() }}%</span>
+  </div>
+
+  <div class="slider-row">
+    <span class="slider-label personal">
+      <mat-icon>person</mat-icon> Personal
+    </span>
+    <mat-slider min="0" max="100" step="1" discrete>
+      <input matSliderThumb [value]="personalPct()" (valueChange)="onPersonalChange($event)">
+    </mat-slider>
+    <span class="slider-value">{{ personalPct() }}%</span>
+  </div>
+
+  <div class="sum-indicator" [class.valid]="isValid()" [class.invalid]="!isValid()">
+    Summe: {{ freiberufPct() + gewerbePct() + personalPct() }}%
+    @if (isValid()) {
+      <mat-icon>check_circle</mat-icon>
+    } @else {
+      <mat-icon>error</mat-icon>
+    }
+  </div>
+</div>
