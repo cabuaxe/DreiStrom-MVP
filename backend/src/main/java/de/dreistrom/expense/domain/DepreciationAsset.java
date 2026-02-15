@@ -45,6 +45,9 @@ public class DepreciationAsset {
     @JoinColumn(name = "expense_entry_id")
     private ExpenseEntry expenseEntry;
 
+    @Column(name = "disposal_date")
+    private LocalDate disposalDate;
+
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private Instant createdAt;
@@ -81,5 +84,14 @@ public class DepreciationAsset {
         this.annualAfa = annualAfa;
         this.expenseEntry = expenseEntry;
         this.updatedAt = Instant.now();
+    }
+
+    public void dispose(LocalDate disposalDate) {
+        this.disposalDate = disposalDate;
+        this.updatedAt = Instant.now();
+    }
+
+    public boolean isDisposed() {
+        return disposalDate != null;
     }
 }
