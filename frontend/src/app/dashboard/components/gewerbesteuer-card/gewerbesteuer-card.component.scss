@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  transition: border-color 0.3s ease;
+
+  &.safe {
+    border-left: 4px solid #2ea043;
+  }
+
+  &.warning {
+    border-left: 4px solid #e65100;
+    background-color: rgba(230, 81, 0, 0.04);
+  }
+}
+
+.card-icon {
+  color: #2ea043;
+
+  &.warning-icon {
+    color: #e65100;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.threshold-section {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.threshold-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.threshold-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.threshold-values {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+mat-progress-bar {
+  margin-bottom: 4px;
+}
+
+.threshold-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #2ea043;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+
+    &.exceeded {
+      color: #e65100;
+    }
+  }
+
+  .exceeded ~ span {
+    color: #e65100;
+  }
+}
