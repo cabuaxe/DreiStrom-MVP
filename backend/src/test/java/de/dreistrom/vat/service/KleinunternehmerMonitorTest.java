@@ -9,19 +9,18 @@ import de.dreistrom.income.event.ThresholdType;
 import de.dreistrom.income.repository.ClientRepository;
 import de.dreistrom.income.repository.IncomeEntryRepository;
 import de.dreistrom.income.service.IncomeService;
+import de.dreistrom.vat.service.KleinunternehmerMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -38,17 +37,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KleinunternehmerMonitorTest {
 
     /** Fix clock to July 1, 2026 (day 182 of 365) for deterministic projection tests. */
-    @TestConfiguration
-    static class TestClockConfig {
-        @Bean
-        @Primary
-        Clock testClock() {
-            return Clock.fixed(
-                    LocalDate.of(2026, 7, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
-                    ZoneId.systemDefault()
-            );
-        }
-    }
+    private static final Clock FIXED_CLOCK = Clock.fixed(
+            LocalDate.of(2026, 7, 1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+            ZoneId.systemDefault()
+    );
+
+    @Autowired
+    private KleinunternehmerMonitor kleinunternehmerMonitor;
 
     @Autowired
     private IncomeService incomeService;
@@ -72,6 +67,8 @@ class KleinunternehmerMonitorTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(kleinunternehmerMonitor, "clock", FIXED_CLOCK);
+
         incomeEntryRepository.deleteAll();
         clientRepository.deleteAll();
         appUserRepository.deleteAll();

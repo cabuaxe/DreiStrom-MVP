@@ -3,7 +3,7 @@ package de.dreistrom.income.controller;
 import de.dreistrom.common.service.AppUserDetails;
 import de.dreistrom.income.dto.AbfaerbungStatusResponse;
 import de.dreistrom.income.service.DashboardService;
-import de.dreistrom.income.service.SseEmitterService;
+import de.dreistrom.income.service.IncomeSseEmitterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +26,7 @@ import java.time.LocalDate;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final SseEmitterService sseEmitterService;
+    private final IncomeSseEmitterService sseEmitterService;
 
     @GetMapping("/abfaerbung")
     @Operation(summary = "Get current Abfärbung status for the authenticated user",
