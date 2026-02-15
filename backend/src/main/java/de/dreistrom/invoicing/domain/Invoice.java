@@ -77,6 +77,9 @@ public class Invoice {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "zm_reportable", nullable = false)
+    private boolean zmReportable = false;
+
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private Instant createdAt;
@@ -138,5 +141,9 @@ public class Invoice {
     public void updateStatus(InvoiceStatus status) {
         this.status = status;
         this.updatedAt = Instant.now();
+    }
+
+    public void markZmReportable(boolean zmReportable) {
+        this.zmReportable = zmReportable;
     }
 }

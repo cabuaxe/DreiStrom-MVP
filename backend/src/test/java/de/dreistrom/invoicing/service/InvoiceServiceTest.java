@@ -7,6 +7,7 @@ import de.dreistrom.common.domain.AppUser;
 import de.dreistrom.common.domain.IncomeStream;
 import de.dreistrom.common.repository.AppUserRepository;
 import de.dreistrom.income.domain.Client;
+import de.dreistrom.income.domain.ClientType;
 import de.dreistrom.income.domain.IncomeEntry;
 import de.dreistrom.income.repository.ClientRepository;
 import de.dreistrom.income.repository.IncomeEntryRepository;
@@ -525,6 +526,185 @@ class InvoiceServiceTest {
 
             assertThat(invoiceService.listByStatus(user.getId(), InvoiceStatus.DRAFT)).hasSize(1);
             assertThat(invoiceService.listByStatus(user.getId(), InvoiceStatus.SENT)).hasSize(1);
+        }
+    }
+
+    @Nested
+    class ReverseChargeAutoDetection {
+
+        private static final List<LineItem> ZERO_VAT_ITEMS = List.of(
+                new LineItem("Consulting", new BigDecimal("10"), new BigDecimal("150.00"), BigDecimal.ZERO));
+
+        @Test
+        void euB2B_autoDetectsReverseCharge() {
+            Client euClient = clientRepository.save(new Client(user, "Austrian Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "AT", "ATU12345678"));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, euClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("1500.00"), BigDecimal.ZERO, new BigDecimal("1500.00"),
+                    null, null);
+
+            assertThat(invoice.getVatTreatment()).isEqualTo(VatTreatment.REVERSE_CHARGE);
+            assertThat(invoice.getNotes()).contains("Steuerschuldnerschaft des Leistungsempfängers");
+        }
+
+        @Test
+        void nonEU_autoDetectsThirdCountry() {
+            Client usClient = clientRepository.save(new Client(user, "US Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "US", null));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, usClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("1500.00"), BigDecimal.ZERO, new BigDecimal("1500.00"),
+                    null, null);
+
+            assertThat(invoice.getVatTreatment()).isEqualTo(VatTreatment.THIRD_COUNTRY);
+            assertThat(invoice.getNotes()).contains("§3a UStG");
+        }
+
+        @Test
+        void deClient_autoDetectsRegular() {
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, frClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, VALID_ITEMS,
+                    new BigDecimal("1500.00"), new BigDecimal("285.00"), new BigDecimal("1785.00"),
+                    null, null);
+
+            assertThat(invoice.getVatTreatment()).isEqualTo(VatTreatment.REGULAR);
+        }
+
+        @Test
+        void euB2C_autoDetectsRegular() {
+            Client euB2cClient = clientRepository.save(new Client(user, "Italian Consumer",
+                    IncomeStream.FREIBERUF, ClientType.B2C, "IT", null));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, euB2cClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, VALID_ITEMS,
+                    new BigDecimal("1500.00"), new BigDecimal("285.00"), new BigDecimal("1785.00"),
+                    null, null);
+
+            assertThat(invoice.getVatTreatment()).isEqualTo(VatTreatment.REGULAR);
+        }
+
+        @Test
+        void reverseCharge_autoAppendsNotice() {
+            Client euClient = clientRepository.save(new Client(user, "French Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "FR", "FR12345678901"));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, euClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("1000.00"), BigDecimal.ZERO, new BigDecimal("1000.00"),
+                    VatTreatment.REVERSE_CHARGE, "Custom note");
+
+            assertThat(invoice.getNotes()).contains("Custom note");
+            assertThat(invoice.getNotes()).contains("Steuerschuldnerschaft des Leistungsempfängers");
+        }
+
+        @Test
+        void reverseCharge_doesNotDuplicateNotice() {
+            Client euClient = clientRepository.save(new Client(user, "Spanish Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "ES", "ESB12345678"));
+
+            String existingNotice = "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge, §13b UStG).";
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, euClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("1000.00"), BigDecimal.ZERO, new BigDecimal("1000.00"),
+                    VatTreatment.REVERSE_CHARGE, existingNotice);
+
+            // Should not duplicate the notice
+            int count = invoice.getNotes().split("Steuerschuldnerschaft").length - 1;
+            assertThat(count).isEqualTo(1);
+        }
+
+        @Test
+        void thirdCountry_withNonZeroVat_rejects() {
+            Client usClient = clientRepository.save(new Client(user, "US Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "US", null));
+
+            assertThatThrownBy(() -> invoiceService.create(user, InvoiceStream.FREIBERUF, usClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, VALID_ITEMS,
+                    new BigDecimal("1500.00"), new BigDecimal("285.00"), new BigDecimal("1785.00"),
+                    VatTreatment.THIRD_COUNTRY, null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Third country")
+                    .hasMessageContaining("§3a UStG");
+        }
+
+        @Test
+        void explicitTreatment_overridesAutoDetection() {
+            // DE client but explicitly set to REVERSE_CHARGE (user override)
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, frClient.getId(),
+                    LocalDate.of(2026, 3, 15), null,
+                    List.of(new LineItem("Service", new BigDecimal("1"), new BigDecimal("100.00"), BigDecimal.ZERO)),
+                    new BigDecimal("100.00"), BigDecimal.ZERO, new BigDecimal("100.00"),
+                    VatTreatment.REVERSE_CHARGE, null);
+
+            assertThat(invoice.getVatTreatment()).isEqualTo(VatTreatment.REVERSE_CHARGE);
+        }
+    }
+
+    @Nested
+    class ZmReporting {
+
+        private static final List<LineItem> ZERO_VAT_ITEMS = List.of(
+                new LineItem("App Revenue", new BigDecimal("1"), new BigDecimal("5000.00"), BigDecimal.ZERO));
+
+        @Test
+        void euB2B_reverseCharge_isFlaggedZmReportable() {
+            Client euClient = clientRepository.save(new Client(user, "Austrian Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "AT", "ATU12345678"));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, euClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("5000.00"), BigDecimal.ZERO, new BigDecimal("5000.00"),
+                    VatTreatment.REVERSE_CHARGE, null);
+
+            assertThat(invoice.isZmReportable()).isTrue();
+        }
+
+        @Test
+        void deClient_regular_notZmReportable() {
+            Invoice invoice = createValidInvoice();
+            assertThat(invoice.isZmReportable()).isFalse();
+        }
+
+        @Test
+        void appleDistribution_flaggedForZm() {
+            Client apple = clientRepository.save(new Client(user, "Apple Distribution International",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "IE", "IE9700053D"));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, apple.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("5000.00"), BigDecimal.ZERO, new BigDecimal("5000.00"),
+                    VatTreatment.REVERSE_CHARGE, null);
+
+            assertThat(invoice.isZmReportable()).isTrue();
+        }
+
+        @Test
+        void googleIreland_flaggedForZm() {
+            Client google = clientRepository.save(new Client(user, "Google Ireland Ltd",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "IE", "IE6388047V"));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, google.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("3000.00"), BigDecimal.ZERO, new BigDecimal("3000.00"),
+                    VatTreatment.REVERSE_CHARGE, null);
+
+            assertThat(invoice.isZmReportable()).isTrue();
+        }
+
+        @Test
+        void nonEU_thirdCountry_notZmReportable() {
+            Client usClient = clientRepository.save(new Client(user, "US Corp",
+                    IncomeStream.FREIBERUF, ClientType.B2B, "US", null));
+
+            Invoice invoice = invoiceService.create(user, InvoiceStream.FREIBERUF, usClient.getId(),
+                    LocalDate.of(2026, 3, 15), null, ZERO_VAT_ITEMS,
+                    new BigDecimal("5000.00"), BigDecimal.ZERO, new BigDecimal("5000.00"),
+                    VatTreatment.THIRD_COUNTRY, null);
+
+            assertThat(invoice.isZmReportable()).isFalse();
         }
     }
 

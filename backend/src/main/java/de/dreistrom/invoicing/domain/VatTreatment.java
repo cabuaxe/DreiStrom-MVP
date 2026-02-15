@@ -11,5 +11,7 @@ public enum VatTreatment {
     /** Kleinunternehmerregelung §19 UStG – no VAT charged */
     SMALL_BUSINESS,
     /** Innergemeinschaftliche Lieferung/Leistung – EU cross-border */
-    INTRA_EU
+    INTRA_EU,
+    /** Drittland – non-EU, no VAT per §3a UStG */
+    THIRD_COUNTRY
 }
