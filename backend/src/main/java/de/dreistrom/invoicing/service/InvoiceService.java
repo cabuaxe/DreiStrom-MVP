@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Invoice lifecycle management with full §14 UStG field validation.
+ * Invoice lifecycle management with full §14 UStG field validation,
+ * reverse charge auto-detection, and ZM reporting flags.
  * On creation, auto-creates a linked IncomeEntry in the correct stream.
  */
 @Service
@@ -35,6 +36,7 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final InvoiceNumberGenerator numberGenerator;
+    private final ReverseChargeService reverseChargeService;
     private final ClientRepository clientRepository;
     private final IncomeEntryRepository incomeEntryRepository;
     private final AuditLogService auditLogService;
@@ -42,7 +44,9 @@ public class InvoiceService {
 
     /**
      * Create a new invoice with full §14 UStG validation.
-     * Automatically generates the sequential invoice number and creates
+     * If vatTreatment is null, auto-detects from client properties.
+     * Automatically generates the sequential invoice number, appends
+     * reverse charge / §3a notices, sets ZM flag, and creates
      * a linked IncomeEntry for the gross total in the matching stream.
      */
     @Transactional
@@ -54,22 +58,32 @@ public class InvoiceService {
 
         Client client = resolveClient(clientId, user.getId(), streamType);
 
-        // §14 UStG validation
+        // Auto-detect VatTreatment if not explicitly provided
+        VatTreatment resolvedTreatment = vatTreatment != null
+                ? vatTreatment
+                : reverseChargeService.determineVatTreatment(client);
+
+        // Auto-append VAT notice for reverse charge / third country / intra-EU
+        String resolvedNotes = appendVatNoticeIfNeeded(notes, resolvedTreatment);
+
+        // §14 UStG validation (with resolved treatment and notes)
         validateUStG14(client, invoiceDate, lineItems, netTotal, vat, grossTotal,
-                vatTreatment, notes);
+                resolvedTreatment, resolvedNotes);
 
         String number = numberGenerator.nextInvoiceNumber(streamType, invoiceDate.getYear());
 
         Invoice invoice = new Invoice(user, streamType, number, client, invoiceDate,
-                lineItems, netTotal, vat, grossTotal, vatTreatment);
+                lineItems, netTotal, vat, grossTotal, resolvedTreatment);
 
-        if (dueDate != null) {
+        // Set dueDate and/or notes via update if needed
+        if (dueDate != null || resolvedNotes != null) {
             invoice.update(client, invoiceDate, dueDate, lineItems,
-                    netTotal, vat, grossTotal, vatTreatment, notes);
-        } else if (notes != null) {
-            invoice.update(client, invoiceDate, null, lineItems,
-                    netTotal, vat, grossTotal, vatTreatment, notes);
+                    netTotal, vat, grossTotal, resolvedTreatment, resolvedNotes);
         }
+
+        // ZM reporting flag
+        invoice.markZmReportable(
+                reverseChargeService.isZmReportable(client, resolvedTreatment));
 
         Invoice saved = invoiceRepository.save(invoice);
 
@@ -103,11 +117,20 @@ public class InvoiceService {
 
         Client client = resolveClient(clientId, userId, invoice.getStreamType());
 
+        VatTreatment resolvedTreatment = vatTreatment != null
+                ? vatTreatment
+                : reverseChargeService.determineVatTreatment(client);
+
+        String resolvedNotes = appendVatNoticeIfNeeded(notes, resolvedTreatment);
+
         validateUStG14(client, invoiceDate, lineItems, netTotal, vat, grossTotal,
-                vatTreatment, notes);
+                resolvedTreatment, resolvedNotes);
 
         invoice.update(client, invoiceDate, dueDate, lineItems,
-                netTotal, vat, grossTotal, vatTreatment, notes);
+                netTotal, vat, grossTotal, resolvedTreatment, resolvedNotes);
+
+        invoice.markZmReportable(
+                reverseChargeService.isZmReportable(client, resolvedTreatment));
 
         return invoice;
     }
@@ -173,6 +196,7 @@ public class InvoiceService {
      * 5. Kleinunternehmer: §19 UStG notice required, VAT must be zero
      * 6. Reverse charge: VAT must be zero
      * 7. Intra-EU: client must have USt-IdNr
+     * 8. Third country: VAT must be zero (§3a UStG)
      */
     private void validateUStG14(Client client, LocalDate invoiceDate,
                                  List<LineItem> lineItems,
@@ -260,6 +284,13 @@ public class InvoiceService {
             }
         }
 
+        // Third country (Drittland) §3a UStG validation
+        if (vatTreatment == VatTreatment.THIRD_COUNTRY) {
+            if (vat != null && vat.compareTo(BigDecimal.ZERO) != 0) {
+                errors.add("Third country invoice: VAT must be 0 per §3a UStG (Leistungsort im Drittland)");
+            }
+        }
+
         if (!errors.isEmpty()) {
             throw new IllegalArgumentException(
                     "Invoice validation failed: " + String.join("; ", errors));
@@ -277,11 +308,28 @@ public class InvoiceService {
 
         if (!valid) {
             throw new IllegalArgumentException(
-                    "Invalid status transition: " + current + " → " + target);
+                    "Invalid status transition: " + current + " \u2192 " + target);
         }
     }
 
     // ── helpers ──────────────────────────────────────────────────────────
+
+    /**
+     * Auto-append the appropriate VAT notice to notes if not already present.
+     */
+    private String appendVatNoticeIfNeeded(String notes, VatTreatment vatTreatment) {
+        String notice = reverseChargeService.getVatNotice(vatTreatment);
+        if (notice == null) {
+            return notes;
+        }
+        if (notes != null && notes.contains(notice)) {
+            return notes;
+        }
+        if (notes == null || notes.isBlank()) {
+            return notice;
+        }
+        return notes + "\n" + notice;
+    }
 
     private Client resolveClient(Long clientId, Long userId, InvoiceStream streamType) {
         if (clientId == null) {
