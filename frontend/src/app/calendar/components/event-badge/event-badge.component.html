@@ -1,0 +1,7 @@
+<span class="badge"
+      [class]="colorClass"
+      [class.completed]="event().status === 'COMPLETED'"
+      [class.overdue]="event().status === 'OVERDUE'"
+      [matTooltip]="event().title + ' — ' + event().dueDate">
+  {{ shortLabel }}
+</span>

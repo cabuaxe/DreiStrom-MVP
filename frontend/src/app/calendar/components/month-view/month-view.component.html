@@ -1,0 +1,27 @@
+<div class="month-grid">
+  <div class="weekday-header">
+    @for (day of weekdays; track day) {
+      <div class="weekday">{{ day }}</div>
+    }
+  </div>
+
+  @for (week of weeks(); track $index) {
+    <div class="week-row">
+      @for (day of week.days; track day.date.getTime()) {
+        <div class="day-cell"
+             [class.other-month]="!day.isCurrentMonth"
+             [class.today]="day.isToday"
+             [class.has-events]="day.events.length > 0">
+          <span class="day-number">{{ day.date.getDate() }}</span>
+          <div class="day-events">
+            @for (event of day.events; track event.id) {
+              <app-event-badge
+                [event]="event"
+                (click)="onEventClick(event)" />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
