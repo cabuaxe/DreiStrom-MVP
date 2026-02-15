@@ -35,4 +35,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                                         @Param("streamType") String streamType,
                                         @Param("from") LocalDate from,
                                         @Param("to") LocalDate to);
+
+    List<Invoice> findByUserIdAndZmReportableTrueAndInvoiceDateBetween(
+            Long userId, LocalDate from, LocalDate to);
 }
