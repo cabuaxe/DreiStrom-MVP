@@ -5,6 +5,7 @@ import de.dreistrom.integration.domain.PayoutPlatform;
 import de.dreistrom.integration.dto.PayoutResponse;
 import de.dreistrom.integration.repository.AppStorePayoutRepository;
 import de.dreistrom.integration.service.ApplePayoutImporter;
+import de.dreistrom.integration.service.GooglePlayPayoutImporter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.List;
 public class AppStoreImportController {
 
     private final ApplePayoutImporter appleImporter;
+    private final GooglePlayPayoutImporter googleImporter;
     private final AppStorePayoutRepository payoutRepository;
 
     @PostMapping("/apple/import")
@@ -33,6 +35,18 @@ public class AppStoreImportController {
             @RequestParam(defaultValue = "false") boolean smallBusinessProgram) throws IOException {
         String csv = new String(file.getBytes(), StandardCharsets.UTF_8);
         return appleImporter.importCsv(user, csv, smallBusinessProgram).stream()
+                .map(PayoutResponse::from)
+                .toList();
+    }
+
+    @PostMapping("/google/import")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<PayoutResponse> importGoogleCsv(
+            @AuthenticationPrincipal AppUser user,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(defaultValue = "false") boolean reducedFeeProgram) throws IOException {
+        String csv = new String(file.getBytes(), StandardCharsets.UTF_8);
+        return googleImporter.importCsv(user, csv, reducedFeeProgram).stream()
                 .map(PayoutResponse::from)
                 .toList();
     }
