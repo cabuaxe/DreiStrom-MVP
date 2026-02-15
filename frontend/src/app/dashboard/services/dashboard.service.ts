@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AbfaerbungStatus } from '../models/abfaerbung-status.model';
 import { KleinunternehmerStatus } from '../models/kleinunternehmer-status.model';
+import { SocialInsuranceStatus } from '../models/social-insurance-status.model';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -24,5 +25,13 @@ export class DashboardService {
       params['year'] = year.toString();
     }
     return this.http.get<KleinunternehmerStatus>(`${this.baseUrl}/vat/kleinunternehmer`, { params });
+  }
+
+  getSocialInsuranceStatus(year?: number): Observable<SocialInsuranceStatus> {
+    const params: Record<string, string> = {};
+    if (year) {
+      params['year'] = year.toString();
+    }
+    return this.http.get<SocialInsuranceStatus>(`${this.baseUrl}/social-insurance/status`, { params });
   }
 }
