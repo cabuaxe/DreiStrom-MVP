@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+
+.card-icon {
+  color: var(--mat-sys-primary);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.year-select {
+  width: 120px;
+}
+
+.loading-text,
+.empty-text {
+  padding: 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stream-column {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container);
+}
+
+.stream-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.freiberuf .stream-header {
+  color: #1565c0;
+}
+
+.gewerbe .stream-header {
+  color: #2e7d32;
+}
+
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85rem;
+
+  &.total {
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px dashed var(--mat-sys-outline-variant);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+}
+
+.label {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.expense {
+  color: #cc092f;
+}
+
+.profit-positive {
+  color: #2ea043;
+}
+
+.profit-negative {
+  color: #cc092f;
+}
+
+.pdf-btn {
+  width: 100%;
+  margin-top: 12px;
+}
+
+mat-divider {
+  margin: 16px 0;
+}
+
+.combined-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.combined-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.combined-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.dual-pdf-btn {
+  margin-left: 16px;
+}
+
+@media (max-width: 599px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .combined-section {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .dual-pdf-btn {
+    margin-left: 0;
+  }
+}
