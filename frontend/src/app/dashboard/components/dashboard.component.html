@@ -1,10 +1,32 @@
 <h2>Dashboard</h2>
 
-<div class="dashboard-grid">
-  <app-kleinunternehmer-card />
-  <app-abfaerbung-card />
-  <app-gewerbesteuer-card />
-  <app-social-insurance-card />
-  <app-mandatory-filing-card />
-  <app-arbzg-card />
-</div>
+@if (!loaded()) {
+  <p class="loading-hint">Lade Dashboard…</p>
+} @else {
+  <div class="dashboard-grid">
+    @if (!flags() || flags()!.showKleinunternehmerCard) {
+      <app-kleinunternehmer-card />
+    }
+    @if (!flags() || flags()!.showAbfaerbungCard) {
+      <app-abfaerbung-card />
+    }
+    @if (!flags() || flags()!.showGewerbesteuerCard) {
+      <app-gewerbesteuer-card />
+    }
+    @if (!flags() || flags()!.showSocialInsuranceCard) {
+      <app-social-insurance-card />
+    }
+    @if (!flags() || flags()!.showMandatoryFilingCard) {
+      <app-mandatory-filing-card />
+    }
+    @if (!flags() || flags()!.showArbZGCard) {
+      <app-arbzg-card />
+    }
+  </div>
+
+  @if (flags() && flags()!.complexityLevel === 1) {
+    <div class="disclosure-hint">
+      <p>Vereinfachte Ansicht — weitere Schwellenwerte werden angezeigt, sobald Ihre Geschäftstätigkeit wächst.</p>
+    </div>
+  }
+}

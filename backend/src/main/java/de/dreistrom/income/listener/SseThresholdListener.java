@@ -4,6 +4,7 @@ import de.dreistrom.income.event.ThresholdAlert;
 import de.dreistrom.income.event.ThresholdType;
 import de.dreistrom.income.service.ArbZGService;
 import de.dreistrom.income.service.DashboardService;
+import de.dreistrom.income.service.FeatureFlagService;
 import de.dreistrom.income.service.GewerbesteuerThresholdService;
 import de.dreistrom.income.service.IncomeSseEmitterService;
 import de.dreistrom.income.service.MandatoryFilingService;
@@ -22,6 +23,7 @@ public class SseThresholdListener {
     private final GewerbesteuerThresholdService gewerbesteuerThresholdService;
     private final MandatoryFilingService mandatoryFilingService;
     private final ArbZGService arbZGService;
+    private final FeatureFlagService featureFlagService;
 
     @EventListener
     public void onThresholdAlert(ThresholdAlert alert) {
@@ -47,5 +49,9 @@ public class SseThresholdListener {
                     sseEmitterService.send(userId, "social-insurance",
                             arbZGService.getStatus(userId, year));
         }
+
+        // Push updated feature flags on every threshold change
+        sseEmitterService.send(userId, "feature-flags",
+                featureFlagService.getFlags(userId, year));
     }
 }
