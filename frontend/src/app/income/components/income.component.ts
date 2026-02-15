@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IncomeService, StreamType } from '../services/income.service';
+import { AppStoreImportComponent } from './appstore-import/appstore-import.component';
 import { IncomeEntryResponse } from '../../api/generated/model/income-entry-response.model';
 import { CreateIncomeEntryRequestStreamTypeEnum } from '../../api/generated/model/create-income-entry-request.model';
 
@@ -42,6 +43,7 @@ interface StreamTab {
     MatDatepickerModule,
     MatNativeDateModule,
     MatProgressSpinnerModule,
+    AppStoreImportComponent,
   ],
   templateUrl: './income.component.html',
   styleUrl: './income.component.scss',
