@@ -1,0 +1,164 @@
+:host {
+  display: block;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.tab-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-content {
+  margin-top: 16px;
+}
+
+.total-card {
+  border-left: 4px solid var(--mat-sys-primary);
+  margin-bottom: 16px;
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .total-label {
+    font-size: 0.9rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .total-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .entry-count {
+    font-size: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+    margin-top: 4px;
+  }
+}
+
+.actions-bar {
+  margin-bottom: 16px;
+}
+
+.form-card {
+  margin-bottom: 16px;
+
+  .entry-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+    padding-top: 8px;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+  }
+}
+
+.entries-table {
+  width: 100%;
+
+  .amount-col {
+    text-align: right;
+  }
+
+  .pct-col {
+    text-align: center;
+    font-weight: 500;
+
+    &.freiberuf { color: #2EA043; }
+    &.gewerbe { color: #CC092F; }
+    &.personal { color: #3884F4; }
+  }
+}
+
+.gwg-badge {
+  display: inline-block;
+  background: #2EA043;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.rule-chip {
+  display: inline-block;
+  background: var(--mat-sys-surface-container);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+.no-rule {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+}
+
+.section-hint {
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin-bottom: 12px;
+}
+
+.afa-asset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  button.selected {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+@media (max-width: 599px) {
+  .form-card .entry-form {
+    grid-template-columns: 1fr;
+  }
+}

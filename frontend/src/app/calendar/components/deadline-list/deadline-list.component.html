@@ -1,0 +1,50 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">notifications_active</mat-icon>
+    <mat-card-title>Anstehende Fristen</mat-card-title>
+    <mat-card-subtitle>Nächste Abgabetermine</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (loading()) {
+      <p class="loading-text">Lade Fristen…</p>
+    } @else if (sortedEvents().length === 0) {
+      <div class="empty-state">
+        <mat-icon>event_available</mat-icon>
+        <p>Keine anstehenden Fristen</p>
+      </div>
+    } @else {
+      <div class="deadline-items">
+        @for (event of sortedEvents(); track event.id) {
+          <div class="deadline-item" [class]="urgencyClass(event.dueDate)">
+            <div class="deadline-icon">
+              <mat-icon [class]="'status-' + event.status.toLowerCase()">
+                {{ statusIcon(event.status) }}
+              </mat-icon>
+            </div>
+
+            <div class="deadline-info">
+              <span class="deadline-title">{{ event.title }}</span>
+              <span class="deadline-type">
+                <mat-chip-set>
+                  <mat-chip class="type-chip">{{ eventTypeLabel(event.eventType) }}</mat-chip>
+                </mat-chip-set>
+              </span>
+              <span class="deadline-date">{{ event.dueDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+
+            <div class="deadline-countdown" [class]="urgencyClass(event.dueDate)">
+              <span class="countdown-value">{{ countdownLabel(event.dueDate) }}</span>
+            </div>
+
+            <button mat-icon-button
+                    (click)="onComplete(event)"
+                    matTooltip="Als erledigt markieren">
+              <mat-icon>check_circle_outline</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

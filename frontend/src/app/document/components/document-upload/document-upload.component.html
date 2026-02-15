@@ -1,0 +1,64 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">cloud_upload</mat-icon>
+    <mat-card-title>Dokument hochladen</mat-card-title>
+    <mat-card-subtitle>GoBD-konform mit SHA-256 Prüfsumme</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Drop zone -->
+    <div class="drop-zone"
+         [class.drag-over]="dragOver()"
+         [class.has-file]="selectedFile()"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave()"
+         (drop)="onDrop($event)">
+      @if (selectedFile(); as file) {
+        <mat-icon>description</mat-icon>
+        <span class="file-name">{{ file.name }}</span>
+        <span class="file-size">{{ formatFileSize(file.size) }}</span>
+      } @else {
+        <mat-icon>cloud_upload</mat-icon>
+        <span>Datei hierher ziehen oder</span>
+        <button mat-stroked-button (click)="fileInput.click()">
+          Datei auswählen
+        </button>
+      }
+      <input #fileInput type="file" hidden (change)="onFileSelect($event)" />
+    </div>
+
+    <!-- Upload options -->
+    @if (selectedFile()) {
+      <div class="upload-options">
+        <mat-form-field appearance="outline" class="type-field">
+          <mat-label>Dokumenttyp</mat-label>
+          <mat-select [value]="documentType()" (selectionChange)="documentType.set($event.value)">
+            @for (opt of typeOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="desc-field">
+          <mat-label>Beschreibung (optional)</mat-label>
+          <input matInput [value]="description()" (input)="description.set($any($event.target).value)" />
+        </mat-form-field>
+
+        @if (uploading()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
+        @if (error()) {
+          <p class="error-text">{{ error() }}</p>
+        }
+
+        <button mat-flat-button color="primary"
+                [disabled]="uploading()"
+                (click)="onUpload()">
+          <mat-icon>upload</mat-icon>
+          Hochladen
+        </button>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

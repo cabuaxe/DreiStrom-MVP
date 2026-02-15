@@ -1,0 +1,251 @@
+.tab-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .stream-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+}
+
+.stream-content {
+  padding: 16px 0;
+}
+
+.total-card {
+  border-left: 4px solid;
+  margin-bottom: 16px;
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .total-label {
+    font-size: 14px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .total-amount {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .entry-count {
+    font-size: 12px;
+    color: var(--mat-sys-on-surface-variant);
+    margin-top: 4px;
+  }
+}
+
+.actions-bar {
+  margin-bottom: 16px;
+}
+
+// ── Form styles ─────────────────────────────────────────────────
+
+.form-card {
+  margin-bottom: 24px;
+}
+
+.invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.vat-detection-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff8dc;
+  border: 1px solid #c8b464;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 8px;
+
+  mat-icon {
+    color: #b8860b;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.client-country {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 12px;
+}
+
+// ── Line items ──────────────────────────────────────────────────
+
+.line-items-section {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.line-item-row {
+  margin-bottom: 4px;
+}
+
+.line-item-fields {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  .description-field {
+    flex: 3;
+  }
+
+  .number-field {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .number-field-sm {
+    flex: 0.7;
+    min-width: 80px;
+  }
+}
+
+.add-line-btn {
+  margin-top: 8px;
+}
+
+// ── Totals ──────────────────────────────────────────────────────
+
+.totals-section {
+  background: var(--mat-sys-surface-variant);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  max-width: 300px;
+  margin-left: auto;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+
+  &.gross-line {
+    font-weight: 600;
+    font-size: 16px;
+    border-top: 1px solid var(--mat-sys-outline);
+    margin-top: 4px;
+    padding-top: 8px;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+// ── Table styles ────────────────────────────────────────────────
+
+.invoices-table {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.amount-col {
+  text-align: right;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.vat-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--mat-sys-surface-variant);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.delete-action {
+  color: var(--mat-sys-error);
+}
+
+// ── Empty state & loading ───────────────────────────────────────
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────────
+
+@media (max-width: 599px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .line-item-fields {
+    flex-wrap: wrap;
+
+    .description-field {
+      flex: 1 1 100%;
+    }
+  }
+
+  .totals-section {
+    max-width: 100%;
+  }
+}

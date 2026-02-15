@@ -1,0 +1,99 @@
+@if (loading() && !status()) {
+  <mat-card>
+    <mat-card-content class="loading-state">
+      <mat-icon>hourglass_empty</mat-icon>
+      <span>Lade Sozialversicherungs-Status…</span>
+    </mat-card-content>
+  </mat-card>
+} @else if (status(); as s) {
+  <mat-card [class]="riskColor()">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="card-icon" [class]="'icon-' + riskColor()">
+        {{ riskIcon() }}
+      </mat-icon>
+      <mat-card-title>Sozialversicherung</mat-card-title>
+      <mat-card-subtitle>§5 Abs. 5 SGB V — {{ s.year }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="risk-badge" [class]="riskColor()">
+        {{ riskLabel() }}
+      </div>
+
+      <!-- Hours comparison -->
+      <div class="metric-section">
+        <h4 class="section-label">Wochenstunden (Durchschnitt)</h4>
+        <div class="hours-bars">
+          <div class="bar-row">
+            <span class="bar-label">Angestellt</span>
+            <div class="bar-track">
+              <div class="bar-fill employment"
+                   [style.width.%]="employmentBarWidth()"></div>
+            </div>
+            <span class="bar-value">{{ s.avgEmploymentHoursWeekly | number:'1.1-1':'de-DE' }}h</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Selbständig</span>
+            <div class="bar-track">
+              <div class="bar-fill self-employed"
+                   [class.risk]="s.hoursRiskFlag"
+                   [style.width.%]="selfEmployedBarWidth()"></div>
+            </div>
+            <span class="bar-value">{{ s.avgSelfEmployedHoursWeekly | number:'1.1-1':'de-DE' }}h</span>
+          </div>
+        </div>
+        <div class="threshold-marker">
+          <span class="threshold-line" [style.left.%]="50"></span>
+          <span class="threshold-text">Schwelle: 20h</span>
+        </div>
+      </div>
+
+      <!-- Income comparison -->
+      <div class="metric-section">
+        <h4 class="section-label">Einkommen (Jahresvergleich)</h4>
+        <div class="income-grid">
+          <div class="income-item">
+            <span class="income-label">Angestellt</span>
+            <span class="income-value">{{ s.totalEmploymentIncome | currency:'EUR':'symbol':'1.0-0':'de-DE' }}</span>
+          </div>
+          <div class="income-item">
+            <span class="income-label">Selbständig</span>
+            <span class="income-value" [class.risk-value]="s.incomeRiskFlag">
+              {{ s.totalSelfEmployedIncome | currency:'EUR':'symbol':'1.0-0':'de-DE' }}
+            </span>
+          </div>
+        </div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="incomeRatio()"
+          [color]="s.incomeRiskFlag ? 'warn' : 'primary'">
+        </mat-progress-bar>
+        <div class="ratio-label">
+          SE-Anteil: {{ incomeRatio() | number:'1.0-1':'de-DE' }}%
+          @if (s.incomeRiskFlag) {
+            <mat-icon class="inline-warning">warning</mat-icon>
+          }
+        </div>
+      </div>
+
+      <!-- Risk flags -->
+      <div class="risk-flags">
+        <div class="flag" [class.flagged]="s.hoursRiskFlag">
+          <mat-icon>{{ s.hoursRiskFlag ? 'cancel' : 'check_circle' }}</mat-icon>
+          <span>SE &gt; 20 Std./Woche</span>
+        </div>
+        <div class="flag" [class.flagged]="s.incomeRiskFlag">
+          <mat-icon>{{ s.incomeRiskFlag ? 'cancel' : 'check_circle' }}</mat-icon>
+          <span>SE-Einkommen &gt; Anstellung</span>
+        </div>
+      </div>
+
+      @if (s.riskMessage) {
+        <div class="risk-message" [class]="riskColor()">
+          <mat-icon>info</mat-icon>
+          <span>{{ s.riskMessage }}</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+}

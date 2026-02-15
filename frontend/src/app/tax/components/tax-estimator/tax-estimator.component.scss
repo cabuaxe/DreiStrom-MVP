@@ -1,0 +1,138 @@
+:host {
+  display: block;
+}
+
+.card-icon {
+  color: var(--mat-sys-primary);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.year-select {
+  width: 120px;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-text {
+  padding: 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.section {
+  padding: 12px 0;
+}
+
+.section-title {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+.label {
+  color: var(--mat-sys-on-surface);
+}
+
+.value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.deduction {
+  color: #2ea043;
+}
+
+.credit {
+  color: #1a7f37;
+}
+
+.tax-amount {
+  color: #cc092f;
+}
+
+.total-row {
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--mat-sys-outline-variant);
+  font-weight: 600;
+}
+
+.credit-row {
+  font-style: italic;
+}
+
+.summary-section {
+  background: var(--mat-sys-surface-container);
+  margin: 0 -16px -16px;
+  padding: 16px;
+  border-radius: 0 0 12px 12px;
+}
+
+.grand-total-row {
+  font-size: 1.1rem;
+
+  .grand-total {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.rate-chips {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.rate-chip {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface);
+  border-radius: 8px;
+  flex: 1;
+}
+
+.rate-label {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.rate-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+mat-divider {
+  margin: 0 -16px;
+}
+
+@media (max-width: 599px) {
+  .rate-chips {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

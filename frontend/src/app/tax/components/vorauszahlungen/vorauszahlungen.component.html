@@ -1,0 +1,75 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">event</mat-icon>
+    <mat-card-title>Vorauszahlungen</mat-card-title>
+    <mat-card-subtitle>Steuervorauszahlungen {{ selectedYear() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="toolbar">
+      <mat-form-field appearance="outline" class="year-select">
+        <mat-label>Jahr</mat-label>
+        <mat-select [value]="selectedYear()" (selectionChange)="onYearChange($event.value)">
+          @for (year of yearOptions; track year) {
+            <mat-option [value]="year">{{ year }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loading()) {
+      <p class="loading-text">Lade Vorauszahlungen…</p>
+    } @else if (!schedule()) {
+      <p class="empty-text">Keine Vorauszahlungsdaten für {{ selectedYear() }} vorhanden.</p>
+    } @else {
+      <!-- Quarter cards -->
+      <div class="quarters-grid">
+        @for (payment of schedule()!.payments; track payment.quarter) {
+          <div class="quarter-card" [class]="'status-' + payment.status.toLowerCase()">
+            <div class="quarter-header">
+              <span class="quarter-label">{{ quarterLabel(payment.quarter) }}</span>
+              <mat-icon class="status-icon">{{ statusIcon(payment.status) }}</mat-icon>
+            </div>
+            <div class="quarter-amount">
+              {{ payment.amount | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+            </div>
+            @if (payment.paid > 0) {
+              <div class="quarter-paid">
+                Bezahlt: {{ payment.paid | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+              </div>
+            }
+            <div class="quarter-due">
+              Fällig: {{ payment.dueDate | date:'dd.MM.yyyy' }}
+            </div>
+            <mat-chip [highlighted]="payment.status !== 'PENDING'" class="status-chip">
+              {{ statusLabel(payment.status) }}
+            </mat-chip>
+          </div>
+        }
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Annual total -->
+      <div class="annual-total">
+        <span class="total-label">Jahressumme</span>
+        <span class="total-value">{{ schedule()!.annualTotal | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+
+      <!-- Adjustment suggestion -->
+      @if (schedule()!.adjustmentSuggestion.recommended) {
+        <div class="adjustment-banner">
+          <mat-icon>info</mat-icon>
+          <div class="adjustment-text">
+            <strong>Anpassungsantrag empfohlen</strong>
+            <p>
+              Abweichung: {{ schedule()!.adjustmentSuggestion.deviationPercent | number:'1.0-0':'de-DE' }}% &middot;
+              Empfohlene Quartalsrate:
+              {{ schedule()!.adjustmentSuggestion.suggestedQuarterlyAmount | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+            </p>
+          </div>
+        </div>
+      }
+    }
+  </mat-card-content>
+</mat-card>

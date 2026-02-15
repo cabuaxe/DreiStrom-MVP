@@ -1,0 +1,56 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: strict
+        name: SESSION
+
+spring:
+  application:
+    name: dreistrom
+
+  datasource:
+    url: jdbc:mysql://localhost:${DB_PORT:3307}/dreistrom?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin
+    username: ${DB_USERNAME:dreistrom_app}
+    password: ${DB_PASSWORD:dreistrom_dev}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          time_zone: Europe/Berlin
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/callback
+    user: ${FLYWAY_USER:dreistrom_migration}
+    password: ${FLYWAY_PASSWORD:dreistrom_dev}
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha

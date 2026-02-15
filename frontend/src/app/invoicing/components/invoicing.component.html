@@ -1,0 +1,273 @@
+<h2>Rechnungen</h2>
+
+<mat-tab-group
+  [selectedIndex]="selectedTabIndex()"
+  (selectedIndexChange)="onTabChange($event)"
+  animationDuration="200ms"
+>
+  @for (tab of tabs; track tab.type) {
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label" [style.--stream-color]="tab.color">
+          <mat-icon>{{ tab.icon }}</mat-icon>
+          <span>{{ tab.label }}</span>
+          <span class="stream-indicator" [style.background]="tab.color"></span>
+        </span>
+      </ng-template>
+    </mat-tab>
+  }
+</mat-tab-group>
+
+<div class="stream-content">
+  <!-- Running total -->
+  <mat-card class="total-card" [style.border-left-color]="tabs[selectedTabIndex()].color">
+    <mat-card-content>
+      <div class="total-row">
+        <span class="total-label">Gesamt {{ tabs[selectedTabIndex()].label }}</span>
+        <span class="total-amount">{{ streamTotal() | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+      <div class="entry-count">{{ filteredInvoices().length }} Rechnungen</div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Add button -->
+  <div class="actions-bar">
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+      {{ showForm() ? 'Abbrechen' : 'Neue Rechnung' }}
+    </button>
+  </div>
+
+  <!-- Invoice form -->
+  @if (showForm()) {
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Neue Rechnung — {{ tabs[selectedTabIndex()].label }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="invoice-form">
+
+          <!-- Client selector -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kunde</mat-label>
+            <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
+              @for (client of streamClients(); track client.id) {
+                <mat-option [value]="client.id">
+                  {{ client.name }}
+                  @if (client.country && client.country !== 'DE') {
+                    <span class="client-country">({{ client.country }})</span>
+                  }
+                </mat-option>
+              }
+            </mat-select>
+            @if (invoiceForm.get('clientId')?.hasError('required')) {
+              <mat-error>Kunde ist erforderlich</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Reverse charge auto-detection notice -->
+          @if (detectedVatTreatment() && detectedVatTreatment() !== 'REGULAR') {
+            <div class="vat-detection-notice">
+              <mat-icon>info</mat-icon>
+              <span>Automatisch erkannt: <strong>{{ getVatTreatmentLabel(detectedVatTreatment()!) }}</strong></span>
+            </div>
+          }
+
+          <!-- Dates row -->
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Rechnungsdatum</mat-label>
+              <input matInput [matDatepicker]="invoiceDatePicker" formControlName="invoiceDate">
+              <mat-datepicker-toggle matIconSuffix [for]="invoiceDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #invoiceDatePicker></mat-datepicker>
+              @if (invoiceForm.get('invoiceDate')?.hasError('required')) {
+                <mat-error>Rechnungsdatum ist erforderlich</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fällig am</mat-label>
+              <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate">
+              <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #dueDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <!-- VAT treatment override -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>USt-Behandlung (optional, wird automatisch erkannt)</mat-label>
+            <mat-select formControlName="vatTreatment">
+              <mat-option [value]="null">Automatisch</mat-option>
+              <mat-option value="REGULAR">Regelbesteuerung (19%)</mat-option>
+              <mat-option value="SMALL_BUSINESS">Kleinunternehmer §19 UStG</mat-option>
+              <mat-option value="REVERSE_CHARGE">Reverse Charge</mat-option>
+              <mat-option value="INTRA_EU">Innergemeinschaftlich</mat-option>
+              <mat-option value="THIRD_COUNTRY">Drittland §3a UStG</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Line items -->
+          <div class="line-items-section">
+            <h3>Leistungen (§14 Abs. 4 Nr. 5 UStG)</h3>
+
+            @for (item of lineItems.controls; track $index; let i = $index) {
+              <div class="line-item-row" [formGroupName]="'lineItems'">
+                <div [formGroupName]="i" class="line-item-fields">
+                  <mat-form-field appearance="outline" class="description-field">
+                    <mat-label>Beschreibung</mat-label>
+                    <input matInput formControlName="description">
+                    @if (item.get('description')?.hasError('required')) {
+                      <mat-error>Erforderlich</mat-error>
+                    }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="number-field">
+                    <mat-label>Menge</mat-label>
+                    <input matInput type="number" formControlName="quantity" step="0.01" min="0.01">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="number-field">
+                    <mat-label>Einzelpreis</mat-label>
+                    <input matInput type="number" formControlName="unitPrice" step="0.01" min="0">
+                    <span matTextPrefix>€&nbsp;</span>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="number-field-sm">
+                    <mat-label>MwSt %</mat-label>
+                    <input matInput type="number" formControlName="vatRate" step="1" min="0">
+                  </mat-form-field>
+
+                  <button mat-icon-button color="warn" type="button"
+                          (click)="removeLineItem(i)"
+                          [disabled]="lineItems.length <= 1"
+                          matTooltip="Position entfernen">
+                    <mat-icon>remove_circle</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+
+            <button mat-stroked-button type="button" (click)="addLineItem()" class="add-line-btn">
+              <mat-icon>add</mat-icon> Position hinzufügen
+            </button>
+          </div>
+
+          <!-- Auto-calculated totals -->
+          <div class="totals-section">
+            <div class="total-line">
+              <span>Nettobetrag:</span>
+              <span>{{ calculatedNetTotal | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+            </div>
+            <div class="total-line">
+              <span>USt:</span>
+              <span>{{ calculatedVat | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+            </div>
+            <div class="total-line gross-line" [style.color]="tabs[selectedTabIndex()].color">
+              <span>Bruttobetrag:</span>
+              <span>{{ calculatedGrossTotal | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Hinweise / Bemerkungen</mat-label>
+            <textarea matInput formControlName="notes" rows="3"></textarea>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit"
+                    [disabled]="invoiceForm.invalid || lineItems.length === 0">
+              <mat-icon>save</mat-icon> Rechnung erstellen
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Loading spinner -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  <!-- Invoices table -->
+  @if (!loading() && filteredInvoices().length > 0) {
+    <table mat-table [dataSource]="filteredInvoices()" class="invoices-table">
+
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>Nr.</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.number }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Kunde</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.client?.name ?? '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="invoiceDate">
+        <th mat-header-cell *matHeaderCellDef>Datum</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.invoiceDate | date:'dd.MM.yyyy':'':'de-DE' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="grossTotal">
+        <th mat-header-cell *matHeaderCellDef class="amount-col">Brutto</th>
+        <td mat-cell *matCellDef="let inv" class="amount-col">
+          {{ inv.grossTotal | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="status-badge" [style.background]="getStatusColor(inv.status)">
+            {{ getStatusLabel(inv.status) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vatTreatment">
+        <th mat-header-cell *matHeaderCellDef>USt</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="vat-chip">{{ getVatTreatmentLabel(inv.vatTreatment) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let inv">
+          <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Aktionen">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="downloadPdf(inv)">
+              <mat-icon>picture_as_pdf</mat-icon> PDF herunterladen
+            </button>
+            @for (status of getAvailableTransitions(inv.status); track status) {
+              <button mat-menu-item (click)="updateStatus(inv, status)">
+                <mat-icon>{{ status === 'CANCELLED' ? 'cancel' : 'arrow_forward' }}</mat-icon>
+                {{ getStatusLabel(status) }}
+              </button>
+            }
+            @if (inv.status === 'DRAFT') {
+              <button mat-menu-item (click)="deleteInvoice(inv.id)" class="delete-action">
+                <mat-icon color="warn">delete</mat-icon> Löschen
+              </button>
+            }
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+
+  @if (!loading() && filteredInvoices().length === 0) {
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>Noch keine Rechnungen für {{ tabs[selectedTabIndex()].label }} vorhanden.</p>
+    </div>
+  }
+</div>

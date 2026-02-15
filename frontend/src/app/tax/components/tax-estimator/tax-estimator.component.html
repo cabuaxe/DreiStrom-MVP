@@ -1,0 +1,148 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">calculate</mat-icon>
+    <mat-card-title>Steuerprojektion</mat-card-title>
+    <mat-card-subtitle>Voraussichtliche Steuerbelastung {{ selectedYear() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="toolbar">
+      <mat-form-field appearance="outline" class="year-select">
+        <mat-label>Jahr</mat-label>
+        <mat-select [value]="selectedYear()" (selectionChange)="onYearChange($event.value)">
+          @for (year of yearOptions; track year) {
+            <mat-option [value]="year">{{ year }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="32"></mat-spinner>
+        <span>Berechne Steuerprojektion…</span>
+      </div>
+    } @else if (!taxResult()) {
+      <p class="empty-text">Keine Steuerdaten für {{ selectedYear() }} vorhanden.</p>
+    } @else {
+      <!-- Income breakdown -->
+      <div class="section">
+        <h4 class="section-title">Einkünfte</h4>
+        <div class="row">
+          <span class="label">Nichtselbständige Arbeit</span>
+          <span class="value">{{ taxResult()!.employmentIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Freiberufliche Tätigkeit</span>
+          <span class="value">{{ taxResult()!.freiberufIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Gewerbebetrieb</span>
+          <span class="value">{{ taxResult()!.gewerbeIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row total-row">
+          <span class="label">Gesamtbruttoeinkünfte</span>
+          <span class="value">{{ taxResult()!.totalGrossIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Deductions -->
+      <div class="section">
+        <h4 class="section-title">Abzüge</h4>
+        <div class="row">
+          <span class="label">Betriebsausgaben Freiberuf</span>
+          <span class="value deduction">−{{ taxResult()!.deductions.businessExpensesFreiberuf | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Betriebsausgaben Gewerbe</span>
+          <span class="value deduction">−{{ taxResult()!.deductions.businessExpensesGewerbe | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Werbungskostenpauschale</span>
+          <span class="value deduction">−{{ taxResult()!.deductions.werbungskostenpauschale | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Sonderausgabenpauschale</span>
+          <span class="value deduction">−{{ taxResult()!.deductions.sonderausgabenpauschale | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row total-row">
+          <span class="label">Zu versteuerndes Einkommen</span>
+          <span class="value">{{ taxResult()!.taxableIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Tax calculation -->
+      <div class="section">
+        <h4 class="section-title">Einkommensteuer</h4>
+        <div class="row">
+          <span class="label">Einkommensteuer §32a EStG</span>
+          <span class="value tax-amount">{{ taxResult()!.incomeTax | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Solidaritätszuschlag</span>
+          <span class="value tax-amount">{{ taxResult()!.solidaritaetszuschlag | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="row total-row">
+          <span class="label">Gesamt ESt + Soli</span>
+          <span class="value tax-amount">{{ taxResult()!.totalTax | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+      </div>
+
+      <!-- Gewerbesteuer section -->
+      @if (gewerbeResult(); as gew) {
+        <mat-divider></mat-divider>
+        <div class="section">
+          <h4 class="section-title">Gewerbesteuer</h4>
+          <div class="row">
+            <span class="label">Gewerbeertrag</span>
+            <span class="value">{{ gew.gewerbeProfit | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+          <div class="row">
+            <span class="label">Freibetrag</span>
+            <span class="value deduction">−{{ gew.freibetrag | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+          <div class="row">
+            <span class="label">Steuermessbetrag ({{ gew.steuermesszahl | percent:'1.1-1':'de-DE' }})</span>
+            <span class="value">{{ gew.steuermessbetrag | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+          <div class="row">
+            <span class="label">Gewerbesteuer (Hebesatz {{ gew.hebesatz }}%)</span>
+            <span class="value tax-amount">{{ gew.gewerbesteuer | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+          <div class="row credit-row">
+            <span class="label">§35 EStG Anrechnung</span>
+            <span class="value credit">−{{ gew.paragraph35Credit | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+          <div class="row total-row">
+            <span class="label">Netto-Gewerbesteuer</span>
+            <span class="value tax-amount">{{ gew.netGewerbesteuer | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+          </div>
+        </div>
+      }
+
+      <mat-divider></mat-divider>
+
+      <!-- Total burden and rates -->
+      <div class="section summary-section">
+        <div class="row grand-total-row">
+          <span class="label">Gesamtbelastung</span>
+          <span class="value grand-total">{{ totalBurden | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+        </div>
+        <div class="rate-chips">
+          <div class="rate-chip">
+            <span class="rate-label">Grenzsteuersatz</span>
+            <span class="rate-value">{{ taxResult()!.marginalRate | percent:'1.1-1':'de-DE' }}</span>
+          </div>
+          <div class="rate-chip">
+            <span class="rate-label">Effektiver Steuersatz</span>
+            <span class="rate-value">{{ taxResult()!.effectiveRate | percent:'1.1-1':'de-DE' }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.document-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  align-items: start;
+}
+
+.document-main {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .document-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .document-sidebar {
+    order: -1;
+  }
+}

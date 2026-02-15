@@ -1,0 +1,101 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar class="card-icon">compare_arrows</mat-icon>
+    <mat-card-title>EÜR Vergleich</mat-card-title>
+    <mat-card-subtitle>Einnahmen-Überschuss-Rechnung {{ selectedYear() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="toolbar">
+      <mat-form-field appearance="outline" class="year-select">
+        <mat-label>Jahr</mat-label>
+        <mat-select [value]="selectedYear()" (selectionChange)="onYearChange($event.value)">
+          @for (year of yearOptions; track year) {
+            <mat-option [value]="year">{{ year }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loading()) {
+      <p class="loading-text">Lade EÜR-Daten…</p>
+    } @else if (!dualEuer()) {
+      <p class="empty-text">Keine EÜR-Daten für {{ selectedYear() }} vorhanden.</p>
+    } @else {
+      <div class="comparison-grid">
+        <!-- Freiberuf column -->
+        <div class="stream-column freiberuf">
+          <div class="stream-header">
+            <mat-icon>work</mat-icon>
+            <span>Freiberuf</span>
+          </div>
+          <ng-container *ngTemplateOutlet="streamDetail; context: { $implicit: dualEuer()!.freiberuf }"></ng-container>
+          <button mat-stroked-button class="pdf-btn" (click)="downloadPdf('FREIBERUF')">
+            <mat-icon>picture_as_pdf</mat-icon>
+            PDF
+          </button>
+        </div>
+
+        <!-- Gewerbe column -->
+        <div class="stream-column gewerbe">
+          <div class="stream-header">
+            <mat-icon>store</mat-icon>
+            <span>Gewerbe</span>
+          </div>
+          <ng-container *ngTemplateOutlet="streamDetail; context: { $implicit: dualEuer()!.gewerbe }"></ng-container>
+          <button mat-stroked-button class="pdf-btn" (click)="downloadPdf('GEWERBE')">
+            <mat-icon>picture_as_pdf</mat-icon>
+            PDF
+          </button>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Combined result -->
+      <div class="combined-section">
+        <div class="combined-row">
+          <span class="combined-label">Gesamtgewinn</span>
+          <span class="combined-value" [class]="profitClass(dualEuer()!.combinedProfit)">
+            {{ dualEuer()!.combinedProfit | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+          </span>
+        </div>
+        <button mat-flat-button color="primary" class="dual-pdf-btn" (click)="downloadDualPdf()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Gesamt-EÜR PDF
+        </button>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
+
+<ng-template #streamDetail let-euer>
+  <div class="detail-rows">
+    <div class="detail-row">
+      <span class="label">Einnahmen</span>
+      <span class="value">{{ euer.totalIncome | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Direkte Ausgaben</span>
+      <span class="value expense">−{{ euer.directExpenses | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+    </div>
+    @if (euer.allocatedSharedExpenses > 0) {
+      <div class="detail-row">
+        <span class="label">Gem. Ausgaben</span>
+        <span class="value expense">−{{ euer.allocatedSharedExpenses | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+    }
+    @if (euer.depreciation > 0) {
+      <div class="detail-row">
+        <span class="label">AfA</span>
+        <span class="value expense">−{{ euer.depreciation | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+    }
+    <div class="detail-row total">
+      <span class="label">Gewinn</span>
+      <span class="value" [class]="profitClass(euer.profit)">
+        {{ euer.profit | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+      </span>
+    </div>
+  </div>
+</ng-template>

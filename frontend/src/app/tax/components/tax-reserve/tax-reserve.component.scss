@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  transition: border-color 0.3s ease;
+
+  &.on-track {
+    border-left: 4px solid #2ea043;
+  }
+
+  &.behind {
+    border-left: 4px solid #cc092f;
+    background-color: rgba(204, 9, 47, 0.04);
+  }
+}
+
+.card-icon {
+  color: #2ea043;
+
+  &.warning-icon {
+    color: #cc092f;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.progress-section {
+  margin-bottom: 16px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.progress-amount {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+mat-progress-bar {
+  border-radius: 4px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.9rem;
+
+  &.highlight {
+    padding: 8px;
+    background: var(--mat-sys-surface-container);
+    border-radius: 8px;
+  }
+}
+
+.detail-label {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.detail-value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.monthly {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
+.remaining {
+  color: #cc092f;
+}
