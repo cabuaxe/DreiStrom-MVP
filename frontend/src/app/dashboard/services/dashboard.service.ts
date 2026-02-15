@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { AbfaerbungStatus } from '../models/abfaerbung-status.model';
 import { KleinunternehmerStatus } from '../models/kleinunternehmer-status.model';
 import { SocialInsuranceStatus } from '../models/social-insurance-status.model';
+import { GewerbesteuerThreshold } from '../models/gewerbesteuer-threshold.model';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -33,5 +34,13 @@ export class DashboardService {
       params['year'] = year.toString();
     }
     return this.http.get<SocialInsuranceStatus>(`${this.baseUrl}/social-insurance/status`, { params });
+  }
+
+  getGewerbesteuerThreshold(year?: number): Observable<GewerbesteuerThreshold> {
+    const params: Record<string, string> = {};
+    if (year) {
+      params['year'] = year.toString();
+    }
+    return this.http.get<GewerbesteuerThreshold>(`${this.baseUrl}/dashboard/gewerbesteuer`, { params });
   }
 }
