@@ -99,6 +99,13 @@
             <version>2.0.3</version>
         </dependency>
 
+        <!-- iCal4j for calendar export -->
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>4.0.8</version>
+        </dependency>
+
         <!-- JAXB for ELSTER XML export -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
