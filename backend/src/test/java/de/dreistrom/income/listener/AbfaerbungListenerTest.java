@@ -66,6 +66,12 @@ class AbfaerbungListenerTest {
                 new UsernamePasswordAuthenticationToken("owner@dreistrom.de", null, List.of()));
     }
 
+    private List<ThresholdAlert> abfaerbungAlerts() {
+        return events.stream(ThresholdAlert.class)
+                .filter(a -> a.getType() == ThresholdType.ABFAERBUNG)
+                .toList();
+    }
+
     @Test
     void alertFires_whenBothThresholdsExceeded() {
         // Gewerbe > 24500 AND ratio > 3%
@@ -78,7 +84,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("25000.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
+        List<ThresholdAlert> alerts = abfaerbungAlerts();
         assertThat(alerts).hasSize(1);
         assertThat(alerts.getFirst().getType()).isEqualTo(ThresholdType.ABFAERBUNG);
         assertThat(alerts.getFirst().getRatio()).isEqualByComparingTo("0.3333");
@@ -98,8 +104,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("25000.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
-        assertThat(alerts).isEmpty();
+        assertThat(abfaerbungAlerts()).isEmpty();
     }
 
     @Test
@@ -113,8 +118,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("24000.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
-        assertThat(alerts).isEmpty();
+        assertThat(abfaerbungAlerts()).isEmpty();
     }
 
     @Test
@@ -123,8 +127,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("100000.00"), LocalDate.of(2026, 6, 1),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
-        assertThat(alerts).isEmpty();
+        assertThat(abfaerbungAlerts()).isEmpty();
     }
 
     @Test
@@ -133,8 +136,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("50000.00"), LocalDate.of(2026, 6, 1),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
-        assertThat(alerts).isEmpty();
+        assertThat(abfaerbungAlerts()).isEmpty();
     }
 
     @Test
@@ -147,16 +149,15 @@ class AbfaerbungListenerTest {
                 new BigDecimal("20000.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        // No alert yet
-        long alertsBefore = events.stream(ThresholdAlert.class).count();
-        assertThat(alertsBefore).isZero();
+        // No Abfärbung alert yet
+        assertThat(abfaerbungAlerts()).isEmpty();
 
         // Update Gewerbe to 30000 (exceeds 24500, ratio = 30000/80000 = 0.375 > 3%)
         incomeService.update(gewerbeEntry.getId(), IncomeStream.GEWERBE,
                 new BigDecimal("30000.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
+        List<ThresholdAlert> alerts = abfaerbungAlerts();
         assertThat(alerts).hasSize(1);
         assertThat(alerts.getFirst().getGewerbeRevenue()).isEqualByComparingTo("30000.00");
     }
@@ -172,7 +173,7 @@ class AbfaerbungListenerTest {
                 new BigDecimal("25001.00"), LocalDate.of(2026, 6, 15),
                 null, null, null);
 
-        List<ThresholdAlert> alerts = events.stream(ThresholdAlert.class).toList();
+        List<ThresholdAlert> alerts = abfaerbungAlerts();
         assertThat(alerts).hasSize(1);
         assertThat(alerts.getFirst().getRatio().scale()).isEqualTo(4);
     }
