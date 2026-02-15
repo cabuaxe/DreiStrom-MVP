@@ -1,0 +1,86 @@
+:host {
+  display: block;
+}
+
+.card-icon {
+  color: var(--mat-sys-primary);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.type-filter {
+  width: 200px;
+}
+
+.loading-text {
+  padding: 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin-top: 8px;
+  }
+}
+
+.doc-table {
+  width: 100%;
+}
+
+.right {
+  text-align: right;
+}
+
+.file-name {
+  display: block;
+  font-weight: 500;
+}
+
+.file-desc {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.retention {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+
+  &.locked {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .retention-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+mat-chip {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 599px) {
+  .doc-table {
+    font-size: 0.85rem;
+  }
+}
