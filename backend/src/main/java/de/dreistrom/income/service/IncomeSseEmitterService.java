@@ -27,13 +27,22 @@ public class IncomeSseEmitterService {
     }
 
     public void send(Long userId, Object data) {
+        send(userId, null, data);
+    }
+
+    public void send(Long userId, String eventName, Object data) {
         List<SseEmitter> userEmitters = emitters.get(userId);
         if (userEmitters == null) {
             return;
         }
         for (SseEmitter emitter : userEmitters) {
             try {
-                emitter.send(SseEmitter.event().data(data, MediaType.APPLICATION_JSON));
+                SseEmitter.SseEventBuilder builder = SseEmitter.event()
+                        .data(data, MediaType.APPLICATION_JSON);
+                if (eventName != null) {
+                    builder.name(eventName);
+                }
+                emitter.send(builder);
             } catch (IOException e) {
                 log.debug("Failed to send SSE event to user {}, removing emitter", userId);
                 remove(userId, emitter);

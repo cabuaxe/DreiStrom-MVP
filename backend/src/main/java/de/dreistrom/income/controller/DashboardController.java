@@ -2,8 +2,14 @@ package de.dreistrom.income.controller;
 
 import de.dreistrom.common.service.AppUserDetails;
 import de.dreistrom.income.dto.AbfaerbungStatusResponse;
+import de.dreistrom.income.dto.ArbZGResponse;
+import de.dreistrom.income.dto.GewerbesteuerThresholdResponse;
+import de.dreistrom.income.dto.MandatoryFilingResponse;
+import de.dreistrom.income.service.ArbZGService;
 import de.dreistrom.income.service.DashboardService;
+import de.dreistrom.income.service.GewerbesteuerThresholdService;
 import de.dreistrom.income.service.IncomeSseEmitterService;
+import de.dreistrom.income.service.MandatoryFilingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,10 +28,13 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/v1/dashboard")
 @RequiredArgsConstructor
-@Tag(name = "Dashboard", description = "Dashboard with Abfärbung monitoring")
+@Tag(name = "Dashboard", description = "Threshold monitoring dashboard")
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final GewerbesteuerThresholdService gewerbesteuerThresholdService;
+    private final MandatoryFilingService mandatoryFilingService;
+    private final ArbZGService arbZGService;
     private final IncomeSseEmitterService sseEmitterService;
 
     @GetMapping("/abfaerbung")
@@ -38,6 +47,39 @@ public class DashboardController {
         AbfaerbungStatusResponse status = dashboardService.getAbfaerbungStatus(
                 userDetails.getId(), effectiveYear);
         return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/gewerbesteuer")
+    @Operation(summary = "Get Gewerbesteuer threshold status (Freibetrag + Bilanzierungspflicht)",
+            responses = @ApiResponse(responseCode = "200", description = "Gewerbesteuer threshold status"))
+    public ResponseEntity<GewerbesteuerThresholdResponse> getGewerbesteuerThreshold(
+            @AuthenticationPrincipal AppUserDetails userDetails,
+            @RequestParam(required = false) Integer year) {
+        int effectiveYear = year != null ? year : LocalDate.now().getYear();
+        return ResponseEntity.ok(
+                gewerbesteuerThresholdService.getStatus(userDetails.getId(), effectiveYear));
+    }
+
+    @GetMapping("/mandatory-filing")
+    @Operation(summary = "Get mandatory tax filing status (§46 EStG, €410 threshold)",
+            responses = @ApiResponse(responseCode = "200", description = "Mandatory filing status"))
+    public ResponseEntity<MandatoryFilingResponse> getMandatoryFilingStatus(
+            @AuthenticationPrincipal AppUserDetails userDetails,
+            @RequestParam(required = false) Integer year) {
+        int effectiveYear = year != null ? year : LocalDate.now().getYear();
+        return ResponseEntity.ok(
+                mandatoryFilingService.getStatus(userDetails.getId(), effectiveYear));
+    }
+
+    @GetMapping("/arbzg")
+    @Operation(summary = "Get ArbZG §3 working time compliance (48h/week limit)",
+            responses = @ApiResponse(responseCode = "200", description = "ArbZG compliance status"))
+    public ResponseEntity<ArbZGResponse> getArbZGStatus(
+            @AuthenticationPrincipal AppUserDetails userDetails,
+            @RequestParam(required = false) Integer year) {
+        int effectiveYear = year != null ? year : LocalDate.now().getYear();
+        return ResponseEntity.ok(
+                arbZGService.getStatus(userDetails.getId(), effectiveYear));
     }
 
     @GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
