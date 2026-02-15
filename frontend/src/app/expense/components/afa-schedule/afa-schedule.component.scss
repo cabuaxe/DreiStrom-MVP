@@ -1,0 +1,16 @@
+.afa-card {
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+  }
+}
+
+.afa-table {
+  width: 100%;
+
+  .amount-col {
+    text-align: right;
+  }
+}

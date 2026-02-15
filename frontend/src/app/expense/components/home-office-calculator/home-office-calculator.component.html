@@ -1,0 +1,106 @@
+<mat-card class="calculator-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>home_work</mat-icon>
+      Homeoffice-Rechner
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Method toggle -->
+    <div class="method-toggle">
+      <mat-button-toggle-group [value]="selectedMethod()" (change)="onMethodChange($event.value)">
+        <mat-button-toggle value="PAUSCHALE">
+          <mat-icon>calendar_today</mat-icon>
+          Homeoffice-Pauschale
+        </mat-button-toggle>
+        <mat-button-toggle value="ARBEITSZIMMER">
+          <mat-icon>meeting_room</mat-icon>
+          Arbeitszimmer
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- Pauschale form -->
+    @if (selectedMethod() === 'PAUSCHALE') {
+      <div class="calculator-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Homeoffice-Tage pro Jahr</mat-label>
+          <input matInput type="number" [ngModel]="homeOfficeDays()"
+                 (ngModelChange)="homeOfficeDays.set($event)"
+                 min="0" max="365">
+          <mat-hint>Max. {{ 210 }} Tage anrechenbar (6 EUR/Tag, max. 1.260 EUR/Jahr)</mat-hint>
+        </mat-form-field>
+      </div>
+    }
+
+    <!-- Arbeitszimmer form -->
+    @if (selectedMethod() === 'ARBEITSZIMMER') {
+      <div class="calculator-form grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Monatsmiete (EUR)</mat-label>
+          <input matInput type="number" [ngModel]="monthlyRent()"
+                 (ngModelChange)="monthlyRent.set($event)" min="0">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nebenkosten/Monat (EUR)</mat-label>
+          <input matInput type="number" [ngModel]="monthlyUtilities()"
+                 (ngModelChange)="monthlyUtilities.set($event)" min="0">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Gesamtfläche (m²)</mat-label>
+          <input matInput type="number" [ngModel]="totalArea()"
+                 (ngModelChange)="totalArea.set($event)" min="1">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Arbeitszimmer (m²)</mat-label>
+          <input matInput type="number" [ngModel]="officeArea()"
+                 (ngModelChange)="officeArea.set($event)" min="0">
+        </mat-form-field>
+      </div>
+
+      @if (officeRatio() > 0) {
+        <p class="ratio-info">
+          Anteil Arbeitszimmer: {{ officeRatio() * 100 | number:'1.1-1':'de-DE' }}%
+          ({{ officeArea() }} m² von {{ totalArea() }} m²)
+        </p>
+      }
+    }
+
+    <!-- Result -->
+    <div class="result-card" [class.recommended]="selectedMethod() === recommendedMethod()">
+      <div class="result-label">
+        {{ selectedMethod() === 'PAUSCHALE' ? 'Homeoffice-Pauschale' : 'Arbeitszimmer-Absetzung' }}
+      </div>
+      <div class="result-amount">
+        {{ currentDeduction() | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+        <span class="per-year">/ Jahr</span>
+      </div>
+      @if (selectedMethod() === recommendedMethod()) {
+        <div class="recommended-hint">
+          <mat-icon>check_circle</mat-icon> Empfohlene Methode
+        </div>
+      } @else {
+        <div class="alternative-hint">
+          Tipp: {{ recommendedMethod() === 'PAUSCHALE' ? 'Pauschale' : 'Arbeitszimmer' }}
+          wäre günstiger
+          ({{ (recommendedMethod() === 'PAUSCHALE' ? pauschaleDeduction() : arbeitszimmerDeduction()) | currency:'EUR':'symbol':'1.2-2':'de-DE' }})
+        </div>
+      }
+    </div>
+
+    <!-- Comparison -->
+    <div class="comparison">
+      <div class="comparison-item">
+        <span class="comparison-label">Pauschale</span>
+        <span class="comparison-value">{{ pauschaleDeduction() | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+      <div class="comparison-item">
+        <span class="comparison-label">Arbeitszimmer</span>
+        <span class="comparison-value">{{ arbeitszimmerDeduction() | currency:'EUR':'symbol':'1.2-2':'de-DE' }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

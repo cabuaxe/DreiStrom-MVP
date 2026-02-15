@@ -1,0 +1,33 @@
+<mat-card class="afa-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>trending_down</mat-icon>
+      AfA-Plan: {{ assetName() }}
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="schedule()" class="afa-table">
+      <ng-container matColumnDef="year">
+        <th mat-header-cell *matHeaderCellDef>Jahr</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.year }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="depreciation">
+        <th mat-header-cell *matHeaderCellDef class="amount-col">AfA-Betrag</th>
+        <td mat-cell *matCellDef="let entry" class="amount-col">
+          {{ entry.depreciation | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="remainingBookValue">
+        <th mat-header-cell *matHeaderCellDef class="amount-col">Restwert</th>
+        <td mat-cell *matCellDef="let entry" class="amount-col">
+          {{ entry.remainingBookValue | currency:'EUR':'symbol':'1.2-2':'de-DE' }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
