@@ -36,6 +36,7 @@ describe('AbfaerbungCardComponent', () => {
       getAbfaerbungStatus: vi.fn().mockReturnValue(of(mockStatus)),
     };
     mockSseService = {
+      on: vi.fn().mockReturnValue(EMPTY),
       connect: vi.fn().mockReturnValue(EMPTY),
     };
 
@@ -66,7 +67,7 @@ describe('AbfaerbungCardComponent', () => {
   it('should subscribe to SSE events on init', () => {
     const fixture = TestBed.createComponent(AbfaerbungCardComponent);
     fixture.detectChanges();
-    expect(mockSseService.connect).toHaveBeenCalledWith('/api/v1/dashboard/events');
+    expect(mockSseService.on).toHaveBeenCalledWith('abfaerbung');
   });
 
   it('should compute ratio percent correctly', () => {
@@ -115,8 +116,8 @@ describe('AbfaerbungCardComponent', () => {
 
   it('should update status from SSE event', () => {
     const updatedStatus: AbfaerbungStatus = { ...mockStatus, ratio: 0.06, thresholdExceeded: true };
-    (mockSseService.connect as ReturnType<typeof vi.fn>)
-      .mockReturnValue(of({ type: 'message', data: updatedStatus }));
+    (mockSseService.on as ReturnType<typeof vi.fn>)
+      .mockReturnValue(of({ type: 'abfaerbung', data: updatedStatus }));
 
     const fixture = TestBed.createComponent(AbfaerbungCardComponent);
     fixture.detectChanges();

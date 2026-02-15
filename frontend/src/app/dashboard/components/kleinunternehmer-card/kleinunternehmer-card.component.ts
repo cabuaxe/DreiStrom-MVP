@@ -52,7 +52,7 @@ export class KleinunternehmerCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<KleinunternehmerStatus>('/api/v1/dashboard/events', 'kleinunternehmer')
+    this.sseSub = this.sseService.on<KleinunternehmerStatus>('kleinunternehmer')
       .subscribe({
         next: (event) => this.status.set(event.data),
       });

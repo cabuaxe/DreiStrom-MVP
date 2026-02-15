@@ -20,7 +20,7 @@ describe('App', () => {
   it('should have navigation items', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
-    expect(app.navItems.length).toBe(7);
+    expect(app.navItems.length).toBe(8);
   });
 
   it('should render toolbar with title', () => {

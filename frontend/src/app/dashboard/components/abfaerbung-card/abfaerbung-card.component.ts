@@ -44,7 +44,7 @@ export class AbfaerbungCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<AbfaerbungStatus>('/api/v1/dashboard/events', 'abfaerbung')
+    this.sseSub = this.sseService.on<AbfaerbungStatus>('abfaerbung')
       .subscribe({
         next: (event) => this.status.set(event.data),
       });

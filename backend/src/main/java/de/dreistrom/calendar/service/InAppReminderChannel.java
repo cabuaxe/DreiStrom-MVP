@@ -5,8 +5,11 @@ import de.dreistrom.calendar.domain.Notification;
 import de.dreistrom.calendar.domain.NotificationChannel;
 import de.dreistrom.calendar.repository.NotificationRepository;
 import de.dreistrom.common.domain.AppUser;
+import de.dreistrom.common.sse.UnifiedSseEmitterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * In-app notification channel. Persists notification and publishes via SSE.
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class InAppReminderChannel implements ReminderChannel {
 
     private final NotificationRepository notificationRepository;
-    private final SseEmitterService sseEmitterService;
+    private final UnifiedSseEmitterService sseEmitterService;
 
     @Override
     public NotificationChannel channel() {
@@ -33,7 +36,12 @@ public class InAppReminderChannel implements ReminderChannel {
         notification.markDelivered();
         notificationRepository.save(notification);
 
-        sseEmitterService.sendToUser(user.getId(), notification);
+        sseEmitterService.send(user.getId(), "notification", Map.of(
+                "id", notification.getId() != null ? notification.getId() : 0,
+                "title", notification.getTitle(),
+                "message", notification.getMessage(),
+                "daysBefore", notification.getDaysBefore()
+        ));
     }
 
     private String formatTitle(ComplianceEvent event, int daysBefore) {

@@ -1,16 +1,12 @@
 package de.dreistrom.calendar.controller;
 
-import de.dreistrom.calendar.domain.Notification;
 import de.dreistrom.calendar.domain.NotificationChannel;
 import de.dreistrom.calendar.dto.NotificationResponse;
 import de.dreistrom.calendar.repository.NotificationRepository;
-import de.dreistrom.calendar.service.SseEmitterService;
 import de.dreistrom.common.domain.AppUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +17,6 @@ import java.util.Map;
 public class NotificationController {
 
     private final NotificationRepository notificationRepository;
-    private final SseEmitterService sseEmitterService;
 
     @GetMapping
     public List<NotificationResponse> getNotifications(
@@ -47,8 +42,4 @@ public class NotificationController {
         });
     }
 
-    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@AuthenticationPrincipal AppUser user) {
-        return sseEmitterService.subscribe(user.getId());
-    }
 }

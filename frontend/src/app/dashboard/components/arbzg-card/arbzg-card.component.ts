@@ -47,7 +47,7 @@ export class ArbZGCardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<ArbZGStatus>('/api/v1/dashboard/events', 'social-insurance')
+    this.sseSub = this.sseService.on<ArbZGStatus>('social-insurance')
       .subscribe({
         next: (event) => this.status.set(event.data as ArbZGStatus),
       });

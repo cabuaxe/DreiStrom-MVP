@@ -5,10 +5,10 @@ import de.dreistrom.income.dto.AbfaerbungStatusResponse;
 import de.dreistrom.income.dto.ArbZGResponse;
 import de.dreistrom.income.dto.GewerbesteuerThresholdResponse;
 import de.dreistrom.income.dto.MandatoryFilingResponse;
+import de.dreistrom.common.sse.UnifiedSseEmitterService;
 import de.dreistrom.income.service.ArbZGService;
 import de.dreistrom.income.service.DashboardService;
 import de.dreistrom.income.service.GewerbesteuerThresholdService;
-import de.dreistrom.income.service.IncomeSseEmitterService;
 import de.dreistrom.income.service.MandatoryFilingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +35,7 @@ public class DashboardController {
     private final GewerbesteuerThresholdService gewerbesteuerThresholdService;
     private final MandatoryFilingService mandatoryFilingService;
     private final ArbZGService arbZGService;
-    private final IncomeSseEmitterService sseEmitterService;
+    private final UnifiedSseEmitterService sseEmitterService;
 
     @GetMapping("/abfaerbung")
     @Operation(summary = "Get current Abfärbung status for the authenticated user",
