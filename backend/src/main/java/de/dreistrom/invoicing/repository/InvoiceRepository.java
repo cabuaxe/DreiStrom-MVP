@@ -5,6 +5,7 @@ import de.dreistrom.invoicing.domain.InvoiceStatus;
 import de.dreistrom.invoicing.domain.InvoiceStream;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByUserIdAndStreamType(Long userId, InvoiceStream streamType);
 
     List<Invoice> findByUserIdAndStatus(Long userId, InvoiceStatus status);
+
+    List<Invoice> findByUserIdAndInvoiceDateBetween(Long userId, LocalDate from, LocalDate to);
+
+    List<Invoice> findByUserIdAndClientId(Long userId, Long clientId);
 
     Optional<Invoice> findByNumber(String number);
 }
