@@ -1,9 +1,11 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { Subscription } from 'rxjs';
 import { DashboardService } from '../../services/dashboard.service';
+import { SseService } from '../../../common/services/sse.service';
 import { KleinunternehmerStatus } from '../../models/kleinunternehmer-status.model';
 
 @Component({
@@ -17,8 +19,10 @@ import { KleinunternehmerStatus } from '../../models/kleinunternehmer-status.mod
   templateUrl: './kleinunternehmer-card.component.html',
   styleUrl: './kleinunternehmer-card.component.scss',
 })
-export class KleinunternehmerCardComponent implements OnInit {
+export class KleinunternehmerCardComponent implements OnInit, OnDestroy {
   private readonly dashboardService = inject(DashboardService);
+  private readonly sseService = inject(SseService);
+  private sseSub?: Subscription;
 
   readonly status = signal<KleinunternehmerStatus | null>(null);
   readonly loading = signal(true);
@@ -48,6 +52,14 @@ export class KleinunternehmerCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStatus();
+    this.sseSub = this.sseService.connect<KleinunternehmerStatus>('/api/v1/dashboard/events', 'kleinunternehmer')
+      .subscribe({
+        next: (event) => this.status.set(event.data),
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.sseSub?.unsubscribe();
   }
 
   private loadStatus(): void {

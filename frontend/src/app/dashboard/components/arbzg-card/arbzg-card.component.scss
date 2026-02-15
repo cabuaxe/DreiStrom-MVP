@@ -1,0 +1,131 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  transition: border-color 0.3s ease;
+
+  &.safe {
+    border-left: 4px solid #2ea043;
+  }
+
+  &.warning {
+    border-left: 4px solid #c62828;
+    background-color: rgba(198, 40, 40, 0.04);
+  }
+}
+
+.card-icon {
+  color: #2ea043;
+
+  &.warning-icon {
+    color: #c62828;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.hours-display {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.hours-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2ea043;
+
+  &.exceeded {
+    color: #c62828;
+  }
+}
+
+.hours-limit {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+mat-progress-bar {
+  margin-bottom: 16px;
+}
+
+.hours-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-label {
+  width: 80px;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+
+  &.employment {
+    background: var(--mat-sys-primary);
+  }
+
+  &.self-employed {
+    background: #e65100;
+
+    &.risk {
+      background: #c62828;
+    }
+  }
+}
+
+.bar-value {
+  width: 48px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  font-size: 0.9rem;
+  color: #2ea043;
+  font-weight: 500;
+
+  &.exceeded {
+    color: #c62828;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}

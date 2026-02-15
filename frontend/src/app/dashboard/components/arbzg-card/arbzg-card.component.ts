@@ -1,55 +1,56 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Subscription } from 'rxjs';
 import { DashboardService } from '../../services/dashboard.service';
 import { SseService } from '../../../common/services/sse.service';
-import { GewerbesteuerThreshold } from '../../models/gewerbesteuer-threshold.model';
+import { ArbZGStatus } from '../../models/arbzg-status.model';
 
 @Component({
-  selector: 'app-gewerbesteuer-card',
+  selector: 'app-arbzg-card',
   imports: [
-    CurrencyPipe,
+    DecimalPipe,
     MatCardModule,
     MatIconModule,
     MatProgressBarModule,
   ],
-  templateUrl: './gewerbesteuer-card.component.html',
-  styleUrl: './gewerbesteuer-card.component.scss',
+  templateUrl: './arbzg-card.component.html',
+  styleUrl: './arbzg-card.component.scss',
 })
-export class GewerbesteuerCardComponent implements OnInit, OnDestroy {
+export class ArbZGCardComponent implements OnInit, OnDestroy {
   private readonly dashboardService = inject(DashboardService);
   private readonly sseService = inject(SseService);
   private sseSub?: Subscription;
 
-  readonly status = signal<GewerbesteuerThreshold | null>(null);
+  readonly status = signal<ArbZGStatus | null>(null);
   readonly loading = signal(true);
 
-  readonly freibetragProgress = computed(() => {
+  readonly progressValue = computed(() => {
     const s = this.status();
     if (!s) return 0;
-    return Math.min((s.gewerbeProfit / s.freibetrag) * 100, 100);
+    return Math.min((s.avgTotalHoursWeekly / s.maxAllowedHoursWeekly) * 100, 100);
   });
 
-  readonly revenueProgress = computed(() => {
+  readonly employmentBarWidth = computed(() => {
     const s = this.status();
-    if (!s) return 0;
-    return Math.min((s.gewerbeRevenue / s.bilanzierungRevenueThreshold) * 100, 100);
+    if (!s || s.avgTotalHoursWeekly === 0) return 0;
+    return (s.avgEmploymentHoursWeekly / s.maxAllowedHoursWeekly) * 100;
   });
 
-  readonly hasAnyWarning = computed(() => {
+  readonly selfEmployedBarWidth = computed(() => {
     const s = this.status();
-    return s ? (s.freibetragExceeded || s.bilanzierungRevenueExceeded || s.bilanzierungProfitExceeded) : false;
+    if (!s || s.avgTotalHoursWeekly === 0) return 0;
+    return (s.avgSelfEmployedHoursWeekly / s.maxAllowedHoursWeekly) * 100;
   });
 
   ngOnInit(): void {
     this.loadStatus();
-    this.sseSub = this.sseService.connect<GewerbesteuerThreshold>('/api/v1/dashboard/events', 'gewerbesteuer')
-        .subscribe({
-          next: (event) => this.status.set(event.data),
-        });
+    this.sseSub = this.sseService.connect<ArbZGStatus>('/api/v1/dashboard/events', 'social-insurance')
+      .subscribe({
+        next: (event) => this.status.set(event.data as ArbZGStatus),
+      });
   }
 
   ngOnDestroy(): void {
@@ -58,7 +59,7 @@ export class GewerbesteuerCardComponent implements OnInit, OnDestroy {
 
   private loadStatus(): void {
     this.loading.set(true);
-    this.dashboardService.getGewerbesteuerThreshold().subscribe({
+    this.dashboardService.getArbZGStatus().subscribe({
       next: (data) => {
         this.status.set(data);
         this.loading.set(false);
