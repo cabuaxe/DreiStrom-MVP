@@ -27,7 +27,7 @@ export class MonthViewComponent {
     const lastDay = new Date(year, month + 1, 0);
 
     // Find Monday of the first week
-    let start = new Date(firstDay);
+    const start = new Date(firstDay);
     const dayOfWeek = start.getDay();
     const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     start.setDate(start.getDate() + diff);

@@ -42,7 +42,7 @@ public class AllocationRuleController {
 
     @PostMapping
     @Idempotent
-    @Operation(summary = "Create a new allocation rule",
+    @Operation(operationId = "createAllocationRule", summary = "Create a new allocation rule",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Allocation rule created",
                             headers = @Header(name = "Location", description = "URI of the created rule")),
@@ -68,7 +68,7 @@ public class AllocationRuleController {
     }
 
     @GetMapping
-    @Operation(summary = "List all allocation rules",
+    @Operation(operationId = "listAllocationRules", summary = "List all allocation rules",
             responses = @ApiResponse(responseCode = "200", description = "List of allocation rules"))
     public ResponseEntity<List<AllocationRuleResponse>> list(
             @AuthenticationPrincipal AppUserDetails userDetails) {
@@ -78,7 +78,7 @@ public class AllocationRuleController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get an allocation rule by ID",
+    @Operation(operationId = "getAllocationRule", summary = "Get an allocation rule by ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Allocation rule found"),
                     @ApiResponse(responseCode = "404", description = "Allocation rule not found")
@@ -92,7 +92,7 @@ public class AllocationRuleController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update an allocation rule",
+    @Operation(operationId = "updateAllocationRule", summary = "Update an allocation rule",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Allocation rule updated"),
                     @ApiResponse(responseCode = "400", description = "Validation error (percentages must sum to 100)"),
@@ -113,7 +113,7 @@ public class AllocationRuleController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete an allocation rule",
+    @Operation(operationId = "deleteAllocationRule", summary = "Delete an allocation rule",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Allocation rule deleted"),
                     @ApiResponse(responseCode = "404", description = "Allocation rule not found")

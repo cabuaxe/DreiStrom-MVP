@@ -2,7 +2,6 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 COPY backend/pom.xml .
-COPY backend/.mvn .mvn
 # Cache dependencies
 RUN --mount=type=cache,target=/root/.m2 \
     apt-get update && apt-get install -y maven && \

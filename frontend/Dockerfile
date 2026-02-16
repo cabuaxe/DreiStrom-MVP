@@ -6,14 +6,8 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
-# Copy OpenAPI spec (from backend build artifact)
-COPY backend/target/openapi.json /spec/openapi.json
-
-# Copy source and generate API client
+# Copy source (including pre-generated API client)
 COPY frontend/ .
-# Point generator at the spec location
-RUN sed -i 's|../backend/target/openapi.json|/spec/openapi.json|' openapitools.json && \
-    npm run generate-api
 
 # Production build
 RUN npx ng build --configuration=production
