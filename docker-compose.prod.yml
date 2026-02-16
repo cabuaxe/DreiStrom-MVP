@@ -29,9 +29,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+    image: ghcr.io/cabuaxe/dreistrom-backend:${IMAGE_TAG:-latest}
     container_name: dreistrom-backend
     restart: unless-stopped
     depends_on:
@@ -47,21 +45,19 @@ services:
       FLYWAY_PASSWORD: ${FLYWAY_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      SESSION_COOKIE_SECURE: true
+      SESSION_COOKIE_SECURE: "true"
       APP_BASE_URL: https://3strom.cabuaxe.com
       CORS_ALLOWED_ORIGINS: https://3strom.cabuaxe.com
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dreistrom?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Berlin
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: ghcr.io/cabuaxe/dreistrom-frontend:${IMAGE_TAG:-latest}
     container_name: dreistrom-frontend
     restart: unless-stopped
     depends_on:
       - backend
     ports:
-      - "80:80"
+      - "127.0.0.1:3100:80"
 
 volumes:
   mysql-data:
