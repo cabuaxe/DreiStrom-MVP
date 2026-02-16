@@ -7,14 +7,17 @@ import de.dreistrom.calendar.repository.NotificationRepository;
 import de.dreistrom.common.domain.AppUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 /**
  * Email reminder channel using Spring Mail.
+ * Only activates when a mail server is configured.
  */
 @Component
+@ConditionalOnBean(JavaMailSender.class)
 @RequiredArgsConstructor
 @Slf4j
 public class EmailReminderChannel implements ReminderChannel {
