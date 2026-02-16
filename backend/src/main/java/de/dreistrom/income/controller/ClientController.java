@@ -45,7 +45,7 @@ public class ClientController {
 
     @PostMapping
     @Idempotent
-    @Operation(summary = "Create a new client",
+    @Operation(operationId = "createClient", summary = "Create a new client",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Client created",
                             headers = @Header(name = "Location", description = "URI of the created client")),
@@ -69,7 +69,7 @@ public class ClientController {
     }
 
     @GetMapping
-    @Operation(summary = "List clients with optional stream type filter",
+    @Operation(operationId = "listClients", summary = "List clients with optional stream type filter",
             responses = @ApiResponse(responseCode = "200", description = "List of clients with Scheinselbständigkeit warning"))
     public ResponseEntity<ClientListResponse> list(
             @AuthenticationPrincipal AppUserDetails userDetails,
@@ -91,7 +91,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get a client by ID",
+    @Operation(operationId = "getClient", summary = "Get a client by ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Client found"),
                     @ApiResponse(responseCode = "404", description = "Client not found")
@@ -105,7 +105,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a client",
+    @Operation(operationId = "updateClient", summary = "Update a client",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Client updated"),
                     @ApiResponse(responseCode = "400", description = "Validation error"),
@@ -125,7 +125,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Soft-delete a client (set active=false)",
+    @Operation(operationId = "deleteClient", summary = "Soft-delete a client (set active=false)",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Client deactivated"),
                     @ApiResponse(responseCode = "404", description = "Client not found")

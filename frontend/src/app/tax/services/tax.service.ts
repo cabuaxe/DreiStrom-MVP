@@ -27,7 +27,7 @@ export class TaxService {
     });
   }
 
-  getTaxReserve(year: number, alreadyReserved: number = 0): Observable<TaxReserveRecommendation> {
+  getTaxReserve(year: number, alreadyReserved = 0): Observable<TaxReserveRecommendation> {
     return this.http.get<TaxReserveRecommendation>(`${this.baseUrl}/tax/reserve`, {
       params: { year: year.toString(), alreadyReserved: alreadyReserved.toString() },
     });

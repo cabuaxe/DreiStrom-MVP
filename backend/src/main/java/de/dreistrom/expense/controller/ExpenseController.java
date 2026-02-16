@@ -50,7 +50,7 @@ public class ExpenseController {
 
     @PostMapping
     @Idempotent
-    @Operation(summary = "Create a new expense entry",
+    @Operation(operationId = "createExpense", summary = "Create a new expense entry",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Expense entry created",
                             headers = @Header(name = "Location", description = "URI of the created entry")),
@@ -76,7 +76,7 @@ public class ExpenseController {
     }
 
     @GetMapping
-    @Operation(summary = "List expense entries with optional filters",
+    @Operation(operationId = "listExpenses", summary = "List expense entries with optional filters",
             responses = @ApiResponse(responseCode = "200", description = "List of expense entries"))
     public ResponseEntity<List<ExpenseEntryResponse>> list(
             @AuthenticationPrincipal AppUserDetails userDetails,
@@ -101,7 +101,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get an expense entry by ID",
+    @Operation(operationId = "getExpense", summary = "Get an expense entry by ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Expense entry found"),
                     @ApiResponse(responseCode = "404", description = "Expense entry not found")
@@ -115,7 +115,7 @@ public class ExpenseController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update an expense entry",
+    @Operation(operationId = "updateExpense", summary = "Update an expense entry",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Expense entry updated"),
                     @ApiResponse(responseCode = "400", description = "Validation error"),
@@ -136,7 +136,7 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete an expense entry",
+    @Operation(operationId = "deleteExpense", summary = "Delete an expense entry",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Expense entry deleted"),
                     @ApiResponse(responseCode = "404", description = "Expense entry not found")
@@ -150,7 +150,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/{id}/depreciation")
-    @Operation(summary = "Get depreciation schedule for an expense entry's linked asset",
+    @Operation(operationId = "getExpenseDepreciationSchedule", summary = "Get depreciation schedule for an expense entry's linked asset",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Depreciation schedule"),
                     @ApiResponse(responseCode = "404", description = "Expense entry or linked asset not found")

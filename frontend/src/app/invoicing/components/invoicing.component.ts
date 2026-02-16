@@ -152,7 +152,7 @@ export class InvoicingComponent implements OnInit {
   }
 
   loadClients(): void {
-    this.clientsApi.list1().subscribe({
+    this.clientsApi.listClients().subscribe({
       next: (data) => this.clients.set(data.clients ?? []),
       error: () => {
         this.snackBar.open('Fehler beim Laden der Kunden', 'OK', { duration: 3000 });

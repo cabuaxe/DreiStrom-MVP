@@ -12,18 +12,18 @@ export class IncomeService {
   private readonly api = inject(IncomeEntriesApiService);
 
   list(streamType?: StreamType): Observable<IncomeEntryResponse[]> {
-    return this.api.list(streamType);
+    return this.api.listIncomeEntries(streamType);
   }
 
   create(request: CreateIncomeEntryRequest): Observable<IncomeEntryResponse> {
-    return this.api.create(request);
+    return this.api.createIncomeEntry(request);
   }
 
   update(id: number, request: UpdateIncomeEntryRequest): Observable<IncomeEntryResponse> {
-    return this.api.update(id, request);
+    return this.api.updateIncomeEntry(id, request);
   }
 
   delete(id: number): Observable<void> {
-    return this.api._delete(id) as Observable<void>;
+    return this.api.deleteIncomeEntry(id) as Observable<void>;
   }
 }

@@ -4,6 +4,7 @@ import de.dreistrom.common.domain.AppUser;
 import de.dreistrom.document.domain.DocumentType;
 import de.dreistrom.document.dto.DocumentResponse;
 import de.dreistrom.document.service.DocumentVaultService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class DocumentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(operationId = "uploadDocument", summary = "Upload a new document")
     public DocumentResponse upload(
             @AuthenticationPrincipal AppUser user,
             @RequestParam("file") MultipartFile file,
@@ -41,6 +43,7 @@ public class DocumentController {
     }
 
     @GetMapping
+    @Operation(operationId = "listDocuments", summary = "List documents with optional type filter")
     public List<DocumentResponse> list(
             @AuthenticationPrincipal AppUser user,
             @RequestParam(required = false) DocumentType type) {
@@ -55,11 +58,13 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
+    @Operation(operationId = "getDocument", summary = "Get a document by ID")
     public DocumentResponse getById(@PathVariable Long id) {
         return DocumentResponse.from(documentVaultService.getById(id));
     }
 
     @GetMapping("/{id}/download")
+    @Operation(operationId = "downloadDocument", summary = "Download a document by ID")
     public ResponseEntity<Void> download(@PathVariable Long id) {
         URL url = documentVaultService.getDownloadUrl(id);
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -68,6 +73,7 @@ public class DocumentController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(operationId = "updateDocumentMetadata", summary = "Update document metadata")
     public DocumentResponse updateMetadata(
             @PathVariable Long id,
             @RequestParam(required = false) String description,
@@ -78,6 +84,7 @@ public class DocumentController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(operationId = "deleteDocument", summary = "Delete a document")
     public void delete(@PathVariable Long id) {
         documentVaultService.delete(id);
     }

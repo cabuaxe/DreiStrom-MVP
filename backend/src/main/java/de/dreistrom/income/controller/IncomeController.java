@@ -49,7 +49,7 @@ public class IncomeController {
 
     @PostMapping
     @Idempotent
-    @Operation(summary = "Create a new income entry",
+    @Operation(operationId = "createIncomeEntry", summary = "Create a new income entry",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Income entry created",
                             headers = @Header(name = "Location", description = "URI of the created entry")),
@@ -75,7 +75,7 @@ public class IncomeController {
     }
 
     @GetMapping
-    @Operation(summary = "List income entries with optional filters",
+    @Operation(operationId = "listIncomeEntries", summary = "List income entries with optional filters",
             responses = @ApiResponse(responseCode = "200", description = "List of income entries"))
     public ResponseEntity<List<IncomeEntryResponse>> list(
             @AuthenticationPrincipal AppUserDetails userDetails,
@@ -100,7 +100,7 @@ public class IncomeController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get an income entry by ID",
+    @Operation(operationId = "getIncomeEntry", summary = "Get an income entry by ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Income entry found"),
                     @ApiResponse(responseCode = "404", description = "Income entry not found")
@@ -114,7 +114,7 @@ public class IncomeController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update an income entry",
+    @Operation(operationId = "updateIncomeEntry", summary = "Update an income entry",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Income entry updated"),
                     @ApiResponse(responseCode = "400", description = "Validation error"),
@@ -136,7 +136,7 @@ public class IncomeController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete an income entry",
+    @Operation(operationId = "deleteIncomeEntry", summary = "Delete an income entry",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Income entry deleted"),
                     @ApiResponse(responseCode = "404", description = "Income entry not found")

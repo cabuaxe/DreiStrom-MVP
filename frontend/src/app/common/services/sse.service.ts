@@ -87,6 +87,7 @@ export class SseService implements OnDestroy {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private removeRef(eventName: string): void {
     this.refCount = Math.max(0, this.refCount - 1);
     if (this.refCount === 0) {

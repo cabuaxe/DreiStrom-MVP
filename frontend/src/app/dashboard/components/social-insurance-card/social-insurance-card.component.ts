@@ -6,7 +6,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Subscription } from 'rxjs';
 import { DashboardService } from '../../services/dashboard.service';
 import { SseService } from '../../../common/services/sse.service';
-import { SocialInsuranceStatus, RiskLevel } from '../../models/social-insurance-status.model';
+import { SocialInsuranceStatus } from '../../models/social-insurance-status.model';
 
 @Component({
   selector: 'app-social-insurance-card',

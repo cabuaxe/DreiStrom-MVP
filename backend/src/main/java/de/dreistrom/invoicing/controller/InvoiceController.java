@@ -53,7 +53,7 @@ public class InvoiceController {
 
     @PostMapping
     @Idempotent
-    @Operation(summary = "Create a new invoice",
+    @Operation(operationId = "createInvoice", summary = "Create a new invoice",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Invoice created",
                             headers = @Header(name = "Location", description = "URI of the created invoice")),
@@ -81,7 +81,7 @@ public class InvoiceController {
     }
 
     @GetMapping
-    @Operation(summary = "List invoices with optional filters",
+    @Operation(operationId = "listInvoices", summary = "List invoices with optional filters",
             responses = @ApiResponse(responseCode = "200", description = "List of invoices"))
     public ResponseEntity<List<InvoiceResponse>> list(
             @AuthenticationPrincipal AppUserDetails userDetails,
@@ -110,7 +110,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get an invoice by ID",
+    @Operation(operationId = "getInvoice", summary = "Get an invoice by ID",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Invoice found"),
                     @ApiResponse(responseCode = "404", description = "Invoice not found")
@@ -124,7 +124,7 @@ public class InvoiceController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a DRAFT invoice",
+    @Operation(operationId = "updateInvoice", summary = "Update a DRAFT invoice",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Invoice updated"),
                     @ApiResponse(responseCode = "400", description = "Validation error or not DRAFT"),
@@ -147,7 +147,7 @@ public class InvoiceController {
     }
 
     @PatchMapping("/{id}/status")
-    @Operation(summary = "Transition invoice status",
+    @Operation(operationId = "transitionInvoiceStatus", summary = "Transition invoice status",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Status updated"),
                     @ApiResponse(responseCode = "400", description = "Invalid status transition"),
@@ -163,7 +163,7 @@ public class InvoiceController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a DRAFT invoice",
+    @Operation(operationId = "deleteInvoice", summary = "Delete a DRAFT invoice",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Invoice deleted"),
                     @ApiResponse(responseCode = "400", description = "Not a DRAFT invoice"),
@@ -178,7 +178,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}/pdf")
-    @Operation(summary = "Generate PDF for an invoice with all §14 UStG fields",
+    @Operation(operationId = "generateInvoicePdf", summary = "Generate PDF for an invoice with all §14 UStG fields",
             responses = {
                     @ApiResponse(responseCode = "200", description = "PDF generated"),
                     @ApiResponse(responseCode = "404", description = "Invoice not found")
